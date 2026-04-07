@@ -1,6 +1,18 @@
 import { getSupabase } from "@/lib/supabase";
 import { getLastKeepalivePing } from "@/lib/health-state";
-import { differenceInDays, subDays, format } from "date-fns";
+import { differenceInDays, subDays } from "date-fns";
+
+const CT_TZ = "America/Chicago";
+
+// Returns a "yyyy-MM-dd" string in US Central time for any Date value
+function toCtDateKey(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: CT_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
 
 // ---- Types ----
 
@@ -128,7 +140,7 @@ export function computeUsage(submissions: Submission[]): UsageData {
   // Pre-fill last 30 days
   const dailyMap = new Map<string, { entreINC: number; incubator: number }>();
   for (let i = 29; i >= 0; i--) {
-    dailyMap.set(format(subDays(now, i), "yyyy-MM-dd"), {
+    dailyMap.set(toCtDateKey(subDays(now, i)), {
       entreINC: 0,
       incubator: 0,
     });
@@ -153,7 +165,7 @@ export function computeUsage(submissions: Submission[]): UsageData {
       else last7Incubator++;
     }
 
-    const dateKey = format(date, "yyyy-MM-dd");
+    const dateKey = toCtDateKey(date);
     const entry = dailyMap.get(dateKey);
     if (entry) {
       if (program === "entreINC") entry.entreINC++;

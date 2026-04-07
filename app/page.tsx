@@ -36,7 +36,7 @@ function StatusBanner({ health }: { health: HealthData }) {
       <p className="font-semibold text-base">{message}</p>
       <p className="text-sm opacity-80 shrink-0">
         {health.lastKeepalivePing
-          ? `Last keepalive: ${new Date(health.lastKeepalivePing).toLocaleString()}`
+          ? `Last keepalive: ${new Date(health.lastKeepalivePing).toLocaleString("en-US", { timeZone: "America/Chicago", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" })}`
           : "No keepalive recorded this session."}
         {health.daysSinceLastSubmission !== null && (
           <span className="ml-3 md:block md:ml-0">
@@ -156,7 +156,14 @@ export default async function DashboardPage() {
     metricsError = true;
   }
 
-  const refreshedAt = new Date().toLocaleString();
+  const refreshedAt = new Date().toLocaleString("en-US", {
+    timeZone: "America/Chicago",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    timeZoneName: "short",
+  });
 
   return (
     <div className="min-h-screen bg-[#f8fafc]">
