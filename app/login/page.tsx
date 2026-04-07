@@ -29,18 +29,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-sm bg-white rounded-lg shadow p-8">
-        <h1 className="text-xl font-semibold text-gray-800 mb-6">
-          UL Scheduler Health
+    <div className="min-h-screen flex items-center justify-center bg-[#1e3a5f]">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+        <h1 className="text-2xl font-bold text-[#1e3a5f] mb-1">
+          UL Scheduler Health Dashboard
         </h1>
+        <p className="text-sm text-slate-600 mb-6">Sign in to continue</p>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-slate-50 border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0d9488] focus:border-transparent"
             required
             autoFocus
           />
@@ -48,7 +49,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 text-white rounded px-4 py-2 text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="w-full bg-[#1e3a5f] hover:bg-[#152a47] text-white font-semibold rounded-lg py-3 transition-colors disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>

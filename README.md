@@ -1,4 +1,4 @@
-# UL Scheduler Health Monitor
+# UL Scheduler Health Dashboard
 
 A Railway-deployed Next.js service that keeps the Uncharted Learning Scheduler database alive and provides a health dashboard.
 

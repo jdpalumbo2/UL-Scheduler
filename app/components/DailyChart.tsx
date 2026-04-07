@@ -73,7 +73,7 @@ export default function DailyChart({ data }: { data: DayEntry[] }) {
           dataKey="incubator"
           name="INCubatoredu"
           stackId="a"
-          fill="#d97706"
+          fill="#ea580c"
           radius={[2, 2, 0, 0]}
         />
       </BarChart>

@@ -1,36 +1,15 @@
-"use client";
-
-import { useState } from "react";
-
 type Submitter = { email: string; count: number };
 
 export default function TopSubmitters({ data }: { data: Submitter[] }) {
-  const [expanded, setExpanded] = useState(false);
-  const visible = expanded ? data : data.slice(0, 1);
-
   return (
-    <div>
-      <ul className="space-y-2">
-        {visible.map((s, i) => (
-          <li key={s.email} className="flex items-center justify-between text-sm">
-            <span className="text-slate-600 truncate flex-1 mr-2">
-              <span className="text-slate-400 mr-2">{i + 1}.</span>
-              {s.email}
-            </span>
-            <span className="font-semibold text-slate-800 tabular-nums shrink-0">
-              {s.count}
-            </span>
-          </li>
-        ))}
-      </ul>
-      {data.length > 1 && (
-        <button
-          onClick={() => setExpanded((v) => !v)}
-          className="mt-3 text-xs text-teal-600 hover:text-teal-700 font-medium"
-        >
-          {expanded ? "Show less" : `Show all ${data.length}`}
-        </button>
-      )}
-    </div>
+    <ol className="divide-y divide-slate-100">
+      {data.map((s, i) => (
+        <li key={s.email} className="flex justify-between items-center py-2 text-sm">
+          <span className="text-slate-400 tabular-nums w-5 shrink-0">{i + 1}.</span>
+          <span className="text-slate-700 truncate flex-1 mx-2">{s.email}</span>
+          <span className="font-bold text-[#1e3a5f] tabular-nums shrink-0">{s.count}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

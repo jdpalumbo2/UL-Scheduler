@@ -10,7 +10,6 @@ export default function RefreshButton() {
   function handleRefresh() {
     setLoading(true);
     router.refresh();
-    // Reset loading after a short delay since router.refresh() has no callback
     setTimeout(() => setLoading(false), 1500);
   }
 
@@ -18,7 +17,7 @@ export default function RefreshButton() {
     <button
       onClick={handleRefresh}
       disabled={loading}
-      className="text-xs text-slate-500 hover:text-slate-700 border border-slate-200 rounded px-3 py-1 disabled:opacity-50"
+      className="text-xs font-medium text-[#1e3a5f] border border-[#1e3a5f] rounded-lg px-3 py-1.5 hover:bg-[#1e3a5f] hover:text-white transition-colors disabled:opacity-50"
     >
       {loading ? "Refreshing..." : "Refresh"}
     </button>

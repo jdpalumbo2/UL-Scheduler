@@ -11,6 +11,20 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        navy: {
+          DEFAULT: "#1e3a5f",
+          dark: "#152a47",
+        },
+        teal: {
+          DEFAULT: "#0d9488",
+          light: "#ccfbf1",
+        },
+        orange: {
+          DEFAULT: "#ea580c",
+          light: "#ffedd5",
+        },
+        border: "#e2e8f0",
+        surface: "#ffffff",
       },
     },
   },

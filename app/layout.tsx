@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "UL Scheduler Health",
+  title: "UL Scheduler Health Dashboard",
   description: "Uncharted Learning Scheduler health monitor and keepalive dashboard",
 };
 
