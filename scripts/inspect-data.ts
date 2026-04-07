@@ -100,7 +100,7 @@ async function main() {
     console.log("  (no rows found)");
   } else {
     for (let i = 0; i < entreRows.length; i++) {
-      printRow(entreRows[i] as Row, i);
+      printRow(entreRows[i] as unknown as Row, i);
     }
   }
 
@@ -121,7 +121,7 @@ async function main() {
     console.log("  (no rows found)");
   } else {
     for (let i = 0; i < incubatorRows.length; i++) {
-      printRow(incubatorRows[i] as Row, i);
+      printRow(incubatorRows[i] as unknown as Row, i);
     }
   }
 
