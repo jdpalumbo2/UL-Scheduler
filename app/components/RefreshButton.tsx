@@ -17,8 +17,26 @@ export default function RefreshButton() {
     <button
       onClick={handleRefresh}
       disabled={loading}
-      className="text-xs font-medium text-[#1e3a5f] border border-[#1e3a5f] rounded-lg px-3 py-1.5 hover:bg-[#1e3a5f] hover:text-white transition-colors disabled:opacity-50"
+      className="text-xs font-medium text-navy border border-navy rounded-lg px-3 py-1.5 hover:bg-navy hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
     >
+      {loading && (
+        <svg
+          className="animate-spin h-3 w-3"
+          viewBox="0 0 24 24"
+          fill="none"
+        >
+          <circle
+            className="opacity-25"
+            cx="12" cy="12" r="10"
+            stroke="currentColor" strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+          />
+        </svg>
+      )}
       {loading ? "Refreshing..." : "Refresh"}
     </button>
   );

@@ -8,31 +8,36 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  CartesianGrid,
 } from "recharts";
 
 type DayEntry = { date: string; entreINC: number; incubator: number };
 
 export default function DailyChart({ data }: { data: DayEntry[] }) {
-  // Show abbreviated date labels: "Apr 6"
+  const months = [
+    "Jan","Feb","Mar","Apr","May","Jun",
+    "Jul","Aug","Sep","Oct","Nov","Dec",
+  ];
+
   const formatted = data.map((d) => {
     const [, month, day] = d.date.split("-");
-    const months = [
-      "Jan","Feb","Mar","Apr","May","Jun",
-      "Jul","Aug","Sep","Oct","Nov","Dec",
-    ];
     return {
       ...d,
       label: `${months[parseInt(month, 10) - 1]} ${parseInt(day, 10)}`,
     };
   });
 
-  // Show every 5th label to avoid crowding
   const tickFormatter = (_: string, index: number) =>
     index % 5 === 0 ? formatted[index]?.label ?? "" : "";
 
   return (
-    <ResponsiveContainer width="100%" height={200}>
-      <BarChart data={formatted} barSize={8}>
+    <ResponsiveContainer width="100%" height={220}>
+      <BarChart data={formatted} barSize={10} barCategoryGap="20%">
+        <CartesianGrid
+          vertical={false}
+          stroke="#f1f5f9"
+          strokeDasharray="2 2"
+        />
         <XAxis
           dataKey="label"
           tick={{ fontSize: 11, fill: "#94a3b8" }}
@@ -51,16 +56,17 @@ export default function DailyChart({ data }: { data: DayEntry[] }) {
         <Tooltip
           contentStyle={{
             background: "#fff",
-            border: "1px solid #e2e8f0",
+            border: "1px solid #e5e7eb",
             borderRadius: 8,
             fontSize: 12,
+            boxShadow: "0 1px 3px 0 rgb(15 42 71 / 0.08)",
           }}
-          cursor={{ fill: "#f1f5f9" }}
+          cursor={{ fill: "#f8fafc" }}
         />
         <Legend
           iconType="circle"
           iconSize={8}
-          wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
+          wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
         />
         <Bar
           dataKey="entreINC"
@@ -73,8 +79,8 @@ export default function DailyChart({ data }: { data: DayEntry[] }) {
           dataKey="incubator"
           name="INCubatoredu"
           stackId="a"
-          fill="#ea580c"
-          radius={[2, 2, 0, 0]}
+          fill="#f97316"
+          radius={[4, 4, 0, 0]}
         />
       </BarChart>
     </ResponsiveContainer>
