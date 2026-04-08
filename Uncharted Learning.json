@@ -1,0 +1,1525 @@
+{
+  "name": "Uncharted Learning",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://script.google.com/macros/s/AKfycbxyjxtesYtCFSrlIj3TBAALTZw9lNLwBax8Irzo3bjk9UdKO8Y_h7DE5XYAVYYfTS-o/exec",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"templateDocId\": \"1gLBOIs8Hxaiem4lN5TkzEm6RF9ySSqA04rYUM5XYzQ0\",\n  \"placeholders\": {{ JSON.stringify($('Format Data for template').item.json.placeholders)}},\n  \"weeks\": {{ JSON.stringify ($('Format Data for template').item.json.weeks)}},\n  \"summary\": {{ JSON.stringify($('Format Data for template').item.json.summary) }},\n  \"coursename\": \"{{ $json.meta.program }}\",\n  \"teachername\": \"{{ $json.meta.teacherName }}\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1472,
+        224
+      ],
+      "id": "c2a661f2-3f9b-4722-b66d-4a329046dedb",
+      "name": "Populate Temple with App Script"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://script.google.com/macros/s/AKfycbwaMKaQSSA40LQ2HI0oinXM-QtcNusJZFGFDDYlCGs--bh33Zbo-kponxkM8rYR_Cg/exec",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"templateDocId\": \"1LcwKlrFlKRbtqDM3r2AqP268QllW5tjAwpEDjOWy5sk\",\n  \"placeholders\": {{ JSON.stringify($('Prepare Data for Google Doc').item.json.placeholders)}},\n  \"weeks\": {{ JSON.stringify ($('Prepare Data for Google Doc').item.json.weeks)}},\n  \"summary\": {{ JSON.stringify($('Prepare Data for Google Doc').item.json.summary) }},\n  \"coursename\": \"{{ $json.meta.program }}\",\n  \"teachername\": \"{{ $json.meta.teacherName }}\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1200,
+        1040
+      ],
+      "id": "96946786-2b94-48d7-9217-2921d0955d73",
+      "name": "Populate Temple with App Script1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        -3488,
+        240
+      ],
+      "id": "863553e5-1612-4125-87f9-a95124ca3221",
+      "name": "Anthropic Chat Model",
+      "retryOnFail": true,
+      "credentials": {
+        "anthropicApi": {
+          "id": "QZrgDGCidQhN7GmS",
+          "name": "Johnny Claude Personal"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -3360,
+        336
+      ],
+      "id": "84fef65e-b99c-48d9-85d5-12d2bb542d00",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "027e984e-d95f-49f2-a07e-31a90642de17",
+              "leftValue": "={{ $json.isComplete }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2912,
+        16
+      ],
+      "id": "76c491d9-6542-4174-bfc7-2c7de1822af1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "EntreINC",
+        "limit": 300
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1584,
+        -16
+      ],
+      "id": "7e09ec9c-72b2-45fb-add2-21c911d38d20",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Ensure certifications is an array\nif (typeof data.certifications === \"string\") {\n  data.certifications = [data.certifications];\n} else if (!Array.isArray(data.certifications)) {\n  data.certifications = [];\n}\n\n// Ensure skippedModules is an array\nif (typeof data.skippedModules === \"string\") {\n  data.skippedModules = [data.skippedModules];\n} else if (!Array.isArray(data.skippedModules)) {\n  data.skippedModules = [];\n}\n\n// Ensure completedModules is an array\nif (typeof data.completedModules === \"string\") {\n  try { data.completedModules = JSON.parse(data.completedModules); } \n  catch(e) { data.completedModules = [data.completedModules]; }\n} else if (!Array.isArray(data.completedModules)) {\n  data.completedModules = [];\n}\n\n// Ensure includeCourseConnections has a default\nif (typeof data.includeCourseConnections !== 'boolean') {\n  data.includeCourseConnections = false;\n}\n\n// Validation checks\nconst errors = [];\n\nif (!data.avgMinutesPerWeek || data.avgMinutesPerWeek < 30) {\n  errors.push(\"Average minutes per week must be at least 30\");\n}\n\nif (!data.weeksRemaining || data.weeksRemaining < 1) {\n  errors.push(\"Weeks remaining must be at least 1\");\n}\n\nif (!data.currentLesson || !data.currentLesson.match(/^\\d+\\.\\d+$/)) {\n  errors.push(\"Current lesson must be in format X.X (e.g., 1.1)\");\n}\n\n// If errors, throw\nif (errors.length > 0) {\n  throw new Error(\"Validation errors: \" + errors.join(\", \"));\n}\n\n// Parse current lesson\nconst [currentModule, currentLessonNum] = data.currentLesson.split('.').map(Number);\n\n// Return validated data\nreturn {\n  json: {\n    ...data,\n    currentModule,\n    currentLessonNum,\n    validationPassed: true,\n    errors: []\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1904,
+        -16
+      ],
+      "id": "bcc31743-8b8e-479a-9f08-7eb7c79b9fe5",
+      "name": "EntreINC - Validate Inputs1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// Total available minutes\nconst totalMinutes = data.avgMinutesPerWeek * data.weeksRemaining;\n\n// Average minutes per class session (assume 45-min standard)\nconst avgMinutesPerSession = 45;\n\n// Estimated number of class sessions available\nconst totalSessions = Math.floor(totalMinutes / avgMinutesPerSession);\n\n// Sessions per week\nconst sessionsPerWeek = Math.floor(data.avgMinutesPerWeek / avgMinutesPerSession);\n\nreturn {\n  json: {\n    ...data,\n    totalMinutes,\n    avgMinutesPerSession,\n    totalSessions,\n    sessionsPerWeek, // NEW: Added sessions per week\n    calculationComplete: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1744,
+        -16
+      ],
+      "id": "8534889c-c3af-4cc1-bd99-4c3e36a520d7",
+      "name": "EntreINC - Calculate Available Minutes1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from previous node\nconst data = $input.first().json;\n\n// Get avgMinutesPerSession from previous node (Calculate Available Minutes)\nconst avgMinutesPerSession = $('EntreINC - Calculate Available Minutes1').first().json.avgMinutesPerSession || 45;\n\n// Filter modules that are not skipped\nconst selectedModules = data.allModules.filter(module => !data.skippedModules.includes(module.moduleName));\n\n// Filter lessons from selected modules\nconst selectedLessons = data.allLessons\n  .filter(lesson => !data.skippedModules.includes(lesson.moduleName))\n  .flatMap(lesson => {\n    // Flatten each lesson by its days\n    return lesson.days.map(day => ({\n      lessonId: lesson.lessonId,\n      lessonNumber: lesson.lessonNumber,\n      day: day.day,\n      lessonTitle: lesson.lessonTitle,\n      moduleNumber: lesson.moduleNumber,\n      moduleName: lesson.moduleName,\n      certification: lesson.certification,\n      priorityRanking: day.priorityRanking,\n      estimatedMinutes: avgMinutesPerSession\n    }));\n  });\n\n// Return the same structure as before\nreturn {\n  json: {\n    ...data,\n    selectedModules,\n    selectedLessons,\n    totalModulesSelected: selectedModules.length,\n    totalModulesSkipped: data.skippedModules.length\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1232,
+        -16
+      ],
+      "id": "105ceefe-2722-4e8b-98c3-f9068cb030ee",
+      "name": "EntreINC - Filter Modules by Selection1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst totalWeeksAvailable = data.weeksRemaining;\nconst avgMinutesPerWeek = data.avgMinutesPerWeek || 180;\nconst avgMinutesPerSession = data.avgMinutesPerSession || 45;\nconst sessionsPerWeek = Math.floor(avgMinutesPerWeek / avgMinutesPerSession);\nconst totalSessionsAvailable = totalWeeksAvailable * sessionsPerWeek;\n\n// Current lesson cutoff\nconst currentModule = data.currentModule;\nconst currentLessonNum = data.currentLessonNum;\n\nconsole.log(`========================================`);\nconsole.log(`Calculate Lessons Needed`);\nconsole.log(`Sessions per week: ${sessionsPerWeek}`);\nconsole.log(`Total weeks: ${totalWeeksAvailable}`);\nconsole.log(`Starting from: Module ${currentModule}, Lesson ${currentLessonNum}`);\nconsole.log(`========================================`);\n\n// Group by lesson\nconst lessonGroups = {};\n\ndata.selectedLessons.forEach(lesson => {\n  if (!lessonGroups[lesson.lessonId]) {\n    lessonGroups[lesson.lessonId] = {\n      lessonId: lesson.lessonId,\n      lessonTitle: lesson.lessonTitle,\n      moduleName: lesson.moduleName,\n      moduleNumber: lesson.moduleNumber,\n      lessonNumber: lesson.lessonNumber,\n      certification: lesson.certification,\n      days: []\n    };\n  }\n  lessonGroups[lesson.lessonId].days.push(lesson);\n});\n\n// Sort lessons by module + lesson\nconst sortedLessons = Object.values(lessonGroups).sort((a, b) => {\n  if (a.moduleNumber !== b.moduleNumber) return a.moduleNumber - b.moduleNumber;\n  return a.lessonNumber - b.lessonNumber;\n});\n\n// Filter lessons to start from current lesson\nconst filteredLessons = sortedLessons.filter(lesson => {\n  if (lesson.moduleNumber > currentModule) return true;\n  if (\n    lesson.moduleNumber === currentModule &&\n    lesson.lessonNumber >= currentLessonNum\n  ) return true;\n  return false;\n});\n\n// Day priority order for sorting within each lesson (1, 2, 5, 3, 4)\nconst includeCourseConnections = data.includeCourseConnections || false;\nconst dayOrder = includeCourseConnections\n  ? { 1: 1, 2: 2, 5: 3, 3: 4, 4: 5 }   // CC ON:  Day 5 before 3,4\n  : { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };   // CC OFF: Day 5 last\n\n// Flatten all lesson days and maintain order\nconst lessonsToInclude = [];\n\nfilteredLessons.forEach(lesson => {\n  // Sort days within this lesson by the defined order\n  const sortedDays = lesson.days.sort((a, b) => dayOrder[a.day] - dayOrder[b.day]);\n\n  sortedDays.forEach(day => {\n    lessonsToInclude.push(day);\n  });\n});\n\nconsole.log(`Total lesson days to schedule: ${lessonsToInclude.length}`);\nconsole.log(`========================================`);\n\nreturn {\n  json: {\n    ...data,\n    lessonsToInclude,\n    totalLessonsScheduled: lessonsToInclude.length,\n    sessionsPerWeek\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        -16
+      ],
+      "id": "728d9234-0db0-460f-8f2d-7bd6d8b30bfe",
+      "name": "EntreINC - Calculate Lessons Needed1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// NODE: EntreINC - Distribute Days Across Weeks1 (REWRITTEN v8)\n//\n// Ranking-based selection (matches INCubatoredu):\n// 1. Calculate must-cover slot budget (n × available weeks)\n// 2. Cert-locked days reserved first, then fill from regular\n//    days sorted by priorityRanking DESC\n// 3. Top slots → must-cover, rest → discarded\n// 4. Per week: n must-covers placed sequentially\n//    - Discarded sharing same X.Y lesson number + eligible:\n//      → highest priorityRanking tied → could-cover\n//      → rest → skip\n// 5. Remaining discarded:\n//    a) If exact X.Y lesson had must-covers → Skip in that week\n//    b) Otherwise → DROP completely\n// ============================================================\n\nconst data = $input.first().json;\n\nconst avgMinutesPerWeek = data.avgMinutesPerWeek || 180;\nconst AVG_MINUTES_PER_SESSION = data.avgMinutesPerSession || 45;\nconst n = Math.floor(avgMinutesPerWeek / AVG_MINUTES_PER_SESSION);\nconst totalWeeks = data.weeksRemaining || 30;\n\nconsole.log(`========================================`);\nconsole.log(`ENTREINC - SCHEDULING LOGIC v8 (Ranking-based)`);\nconsole.log(`avgMinutesPerWeek : ${avgMinutesPerWeek}`);\nconsole.log(`n (must-covers/wk): floor(${avgMinutesPerWeek} / ${AVG_MINUTES_PER_SESSION}) = ${n}`);\nconsole.log(`totalWeeks        : ${totalWeeks}`);\nconsole.log(`========================================`);\n\n// ======================================================\n// HELPERS\n// ======================================================\n\nfunction extractLessonNumber(lesson) {\n  return `${lesson.moduleNumber}.${lesson.lessonNumber}`;\n}\n\nconst includeCourseConnections = data.includeCourseConnections || false;\nconst dayOrderMap = includeCourseConnections\n  ? { 1: 1, 2: 2, 5: 3, 3: 4, 4: 5 }   // CC ON:  Day 5 before 3,4\n  : { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5 };   // CC OFF: Day 5 last\n\nfunction sequenceKey(lesson) {\n  const dayOrd = dayOrderMap[lesson.day] || lesson.day;\n  return lesson.moduleNumber * 10000 + lesson.lessonNumber * 100 + dayOrd;\n}\n\n// ======================================================\n// STEP 1 — AVAILABLE WEEKS\n// ======================================================\n\nconst availableWeekNumbers = [];\nfor (let w = 1; w <= totalWeeks; w++) {\n  availableWeekNumbers.push(w);\n}\n\nconst totalMustCoverSlots = n * availableWeekNumbers.length;\n\nconsole.log(`Available weeks     : ${availableWeekNumbers.length}`);\nconsole.log(`Must-cover slots    : ${n} × ${availableWeekNumbers.length} = ${totalMustCoverSlots}`);\n\n// ======================================================\n// STEP 2 — SEPARATE CERTIFICATION-LOCKED AND REGULAR\n// ======================================================\n\nconst allLessonDays = data.lessonsToInclude || [];\n\nconst certLockedDays = allLessonDays.filter(d => d.isCertificationLocked);\nconst certOptionalDays = allLessonDays.filter(d => d.isCertificationOptional);\nconst regularDays = allLessonDays.filter(d => !d.isCertificationLocked && !d.isCertificationOptional);\n\nconsole.log(`\\nCert locked days    : ${certLockedDays.length}`);\nconsole.log(`Cert optional days  : ${certOptionalDays.length}`);\nconsole.log(`Regular days        : ${regularDays.length}`);\n\n// ======================================================\n// STEP 3 — SELECT MUST-COVER FROM REGULAR DAYS\n// ======================================================\n\nlet regularMustCoverBudget = Math.max(0, totalMustCoverSlots - certLockedDays.length);\n\n// If there are surplus slots after covering all regular days,\n// promote cert-optional days (Day 5 of cert modules) to regular pool\nlet promotedOptional = [];\nlet remainingOptional = [...certOptionalDays];\n\nif (regularMustCoverBudget > regularDays.length && certOptionalDays.length > 0) {\n  const surplus = regularMustCoverBudget - regularDays.length;\n  const sortedOptional = [...certOptionalDays].sort((a, b) => {\n    if (b.priorityRanking !== a.priorityRanking) return b.priorityRanking - a.priorityRanking;\n    return sequenceKey(a) - sequenceKey(b);\n  });\n  promotedOptional = sortedOptional.slice(0, surplus);\n  remainingOptional = sortedOptional.slice(surplus);\n  console.log(`Surplus slots: ${surplus} — promoting ${promotedOptional.length} cert-optional days to regular pool`);\n}\n\nconst sortedRegular = [...regularDays, ...promotedOptional].sort((a, b) => {\n  if (b.priorityRanking !== a.priorityRanking) {\n    return b.priorityRanking - a.priorityRanking;\n  }\n  return sequenceKey(a) - sequenceKey(b);\n});\n\nconst regularMustCover = sortedRegular.slice(0, regularMustCoverBudget);\nconst regularDiscarded = sortedRegular.slice(regularMustCoverBudget);\n\nconsole.log(`\\nRegular MC budget   : ${regularMustCoverBudget}`);\nconsole.log(`Regular must-cover  : ${regularMustCover.length}`);\nconsole.log(`Regular discarded   : ${regularDiscarded.length}`);\n\n// ======================================================\n// STEP 4 — COMBINE AND SORT MUST-COVER QUEUE\n// ======================================================\n\nconst mustCoverQueue = [...certLockedDays, ...regularMustCover]\n  .sort((a, b) => sequenceKey(a) - sequenceKey(b));\n\nconst allDiscarded = [...regularDiscarded, ...remainingOptional];\n\nconst discardedByLessonNum = {};\nallDiscarded.forEach(lesson => {\n  const key = extractLessonNumber(lesson);\n  if (!discardedByLessonNum[key]) discardedByLessonNum[key] = [];\n  discardedByLessonNum[key].push(lesson);\n});\n\nconsole.log(`\\nTotal must-cover queue: ${mustCoverQueue.length}`);\nconsole.log(`Total discarded pool : ${allDiscarded.length}`);\n\n// ======================================================\n// STEP 5 — INDEX ALL LESSONS FOR SEQUENCE-SAFETY CHECKS\n// ======================================================\n\nconst allLessonsByLessonNum = {};\nallLessonDays.forEach(lesson => {\n  const key = extractLessonNumber(lesson);\n  if (!allLessonsByLessonNum[key]) allLessonsByLessonNum[key] = [];\n  allLessonsByLessonNum[key].push(lesson);\n});\nObject.values(allLessonsByLessonNum).forEach(arr =>\n  arr.sort((a, b) => sequenceKey(a) - sequenceKey(b))\n);\n\n// ======================================================\n// STEP 6 — DISTRIBUTE INTO WEEKS\n// ======================================================\n\nconst weeks = [];\nconst weekByNumber = {};\nlet mustIndex = 0;\nconst usedDiscardedIds = new Set();\nconst placedMustSequences = new Set();\n\nconst lessonNumToWeekNum = {};\n\nfor (let weekIdx = 0; weekIdx < availableWeekNumbers.length; weekIdx++) {\n  const weekNum = availableWeekNumbers[weekIdx];\n\n  if (mustIndex >= mustCoverQueue.length) break;\n\n  const weekMustCover = [];\n\n  // ── Fill n must-cover slots ──\n  for (let j = 0; j < n && mustIndex < mustCoverQueue.length; j++) {\n    const lesson = mustCoverQueue[mustIndex];\n    weekMustCover.push(lesson);\n\n    const lNum = extractLessonNumber(lesson);\n    if (!lessonNumToWeekNum[lNum]) {\n      lessonNumToWeekNum[lNum] = weekNum;\n    }\n\n    mustIndex++;\n  }\n\n  if (weekMustCover.length === 0) continue;\n\n  const thisWeekMustSeqs = new Set(weekMustCover.map(l => sequenceKey(l)));\n  const allPlacedSoFar = new Set([...placedMustSequences, ...thisWeekMustSeqs]);\n\n  const lessonNumsThisWeek = new Set(\n    weekMustCover.map(l => extractLessonNumber(l))\n  );\n\n  // ── Sequence-safety check ──\n  function isEligible(candidate) {\n    const key = extractLessonNumber(candidate);\n    const candidateSeq = sequenceKey(candidate);\n    const group = allLessonsByLessonNum[key] || [];\n\n    for (const lesson of group) {\n      if (sequenceKey(lesson) >= candidateSeq) break;\n      if (!allPlacedSoFar.has(sequenceKey(lesson))) {\n        return false;\n      }\n    }\n    return true;\n  }\n\n  // ── Find eligible discarded ──\n  const eligibleDiscarded = [];\n  lessonNumsThisWeek.forEach(lessonNum => {\n    (discardedByLessonNum[lessonNum] || []).forEach(lesson => {\n      const id = `${lesson.lessonId}-d${lesson.day}`;\n      if (!usedDiscardedIds.has(id) && isEligible(lesson)) {\n        eligibleDiscarded.push({ ...lesson, _id: id });\n      }\n    });\n  });\n\n  eligibleDiscarded.sort((a, b) => {\n    if (b.priorityRanking !== a.priorityRanking) return b.priorityRanking - a.priorityRanking;\n    return sequenceKey(a) - sequenceKey(b);\n  });\n\n  // ── Assign tiers ──\n  const couldCover = [];\n  const skip = [];\n\n  if (eligibleDiscarded.length > 0) {\n    const topPriority = eligibleDiscarded[0].priorityRanking;\n    eligibleDiscarded.forEach(lesson => {\n      if (lesson.priorityRanking === topPriority && topPriority > 0) {\n        couldCover.push(lesson);\n      } else {\n        skip.push(lesson);\n      }\n      usedDiscardedIds.add(lesson._id);\n    });\n  }\n\n  thisWeekMustSeqs.forEach(seq => placedMustSequences.add(seq));\n\n  const weekLessons = [\n    ...weekMustCover.map(l => ({ ...l, priority: 'Must Cover' })),\n    ...couldCover.map(l => ({ ...l, priority: 'Could Cover' })),\n    ...skip.map(l => ({ ...l, priority: 'Skip' }))\n  ];\n\n  const mc = weekMustCover.length;\n  const cc = couldCover.length;\n  const sk = skip.length;\n  console.log(`Week ${weekNum}: ${mc} MC | ${cc} CC | ${sk} Skip`);\n\n  const weekObj = { weekNumber: weekNum, lessons: weekLessons };\n  weeks.push(weekObj);\n  weekByNumber[weekNum] = weekObj;\n}\n\n// ======================================================\n// STEP 7 — DISTRIBUTE REMAINING DISCARDED LESSONS\n//\n// Rules:\n// a) If this SPECIFIC X.Y lesson had must-covers placed\n//    → Skip in that week\n// b) Otherwise → DROP completely.\n//    Tracked as uncovered for the summary.\n// ======================================================\n\nconst remainingDiscarded = [];\nallDiscarded.forEach(lesson => {\n  const id = `${lesson.lessonId}-d${lesson.day}`;\n  if (!usedDiscardedIds.has(id)) {\n    remainingDiscarded.push({ ...lesson, _id: id });\n  }\n});\n\nconst uncoveredModules = new Set();\nconst uncoveredLessons = new Set();\nlet droppedCount = 0;\n\nif (remainingDiscarded.length > 0) {\n  console.log(`\\nDistributing ${remainingDiscarded.length} remaining discarded lessons...`);\n\n  remainingDiscarded.forEach(lesson => {\n    const lNum = extractLessonNumber(lesson);\n    const id = lesson._id;\n\n    // Only attach if this exact X.Y lesson had must-covers placed\n    if (lessonNumToWeekNum[lNum] && weekByNumber[lessonNumToWeekNum[lNum]]) {\n      const targetWeek = weekByNumber[lessonNumToWeekNum[lNum]];\n      targetWeek.lessons.push({ ...lesson, priority: 'Skip' });\n      usedDiscardedIds.add(id);\n    } else {\n      // DROP — this lesson never had any must-covers placed\n      uncoveredModules.add(lesson.moduleName);\n      uncoveredLessons.add(`${lNum}: ${lesson.lessonTitle}`);\n      droppedCount++;\n      usedDiscardedIds.add(id);\n    }\n  });\n\n  console.log(`Dropped ${droppedCount} lesson days`);\n  console.log(`Uncovered modules: ${[...uncoveredModules].join(', ')}`);\n  console.log(`Uncovered lessons: ${[...uncoveredLessons].join(', ')}`);\n}\n\n// ── Final counts ──\nconst allScheduled = weeks.flatMap(w => w.lessons);\nconst mcTotal = allScheduled.filter(l => l.priority === 'Must Cover').length;\nconst ccTotal = allScheduled.filter(l => l.priority === 'Could Cover').length;\nconst skTotal = allScheduled.filter(l => l.priority === 'Skip').length;\n\nconsole.log(`\\n========================================`);\nconsole.log(`FINAL DISTRIBUTION`);\nconsole.log(`Must Cover : ${mcTotal}`);\nconsole.log(`Could Cover: ${ccTotal}`);\nconsole.log(`Skip       : ${skTotal}`);\nconsole.log(`Dropped    : ${droppedCount}`);\nconsole.log(`Total scheduled: ${allScheduled.length}`);\nconsole.log(`Total dropped  : ${droppedCount}`);\nconsole.log(`Weeks scheduled: ${weeks.length}`);\nconsole.log(`========================================`);\n\nreturn {\n  json: {\n    ...data,\n    weeks,\n    totalWeeksScheduled: weeks.length,\n    sessionsPerWeek: n,\n    uncoveredModules: [...uncoveredModules],\n    uncoveredLessons: [...uncoveredLessons],\n    droppedLessonDays: droppedCount\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        -16
+      ],
+      "id": "82aa2677-372f-43c6-b3af-1ac6c47e10e2",
+      "name": "EntreINC - Distribute Days Across Weeks1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\nconst weeklySchedule = data.weeks.map(week => {\n  const lessonMap = {};\n\n  week.lessons.forEach(lesson => {\n    if (!lessonMap[lesson.lessonId]) {\n      lessonMap[lesson.lessonId] = {\n        lessonId: lesson.lessonId,\n        lessonNumber: lesson.lessonNumber,\n        moduleNumber: lesson.moduleNumber,\n        lessonTitle: lesson.lessonTitle,\n        moduleName: lesson.moduleName,\n        certification: lesson.certification,\n        days: [],\n        mustCoverDays: [],\n        shouldCoverDays: [],\n        canSkipDays: []\n      };\n    }\n\n    lessonMap[lesson.lessonId].days.push(lesson.day);\n\n    // Categorize by final priority\n    if (lesson.priority === \"Must Cover\") {\n      lessonMap[lesson.lessonId].mustCoverDays.push(lesson.day);\n    } \n    else if (lesson.priority === \"Could Cover\") {\n      lessonMap[lesson.lessonId].shouldCoverDays.push(lesson.day);\n    } \n    else if (lesson.priority === \"Skip\") {\n      lessonMap[lesson.lessonId].canSkipDays.push(lesson.day);\n    }\n  });\n\n  const lessonEntries = Object.values(lessonMap).map(l => {\n    // Build lesson display text\n    let lessonText = `Lesson ${l.moduleNumber}.${l.lessonNumber}: ${l.lessonTitle}`;\n    \n    return {\n      lessonId: l.lessonId,\n      lessonNumber: l.lessonNumber,\n      moduleNumber: l.moduleNumber,\n      lessonTitle: l.lessonTitle,\n      moduleName: l.moduleName,\n      certification: l.certification,\n      days: l.days.sort((a, b) => a - b),\n      mustCoverDays: l.mustCoverDays.sort((a, b) => a - b),\n      shouldCoverDays: l.shouldCoverDays.sort((a, b) => a - b),\n      canSkipDays: l.canSkipDays.sort((a, b) => a - b),\n      lessonText\n    };\n  });\n\n  return {\n    weekNumber: week.weekNumber,\n    lessonEntries,\n    weekSummary: `Week ${week.weekNumber}`\n  };\n});\n\nreturn {\n  json: {\n    ...data,\n    weeklySchedule\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        -16
+      ],
+      "id": "08b84dcd-ac5d-4614-95bb-d8efc12b78c5",
+      "name": "EntreINC - Build Weekly Schedule1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- INPUTS ---\nconst data = $input.first().json;\n\n// --- SAFE DEFAULTS ---\nconst certifications = Array.isArray(data.certifications) ? data.certifications : [];\nconst skippedModules = Array.isArray(data.skippedModules) ? data.skippedModules : [];\nconst completedModules = Array.isArray(data.completedModules) ? data.completedModules : [];\nconst mandatoryModules = Array.isArray(data.mandatoryModules) ? data.mandatoryModules : [];\nconst guidanceMessages = Array.isArray(data.guidanceMessages) ? data.guidanceMessages : [];\nconst weeklySchedule = Array.isArray(data.weeklySchedule) ? data.weeklySchedule : [];\n\n// --- DROPPED/UNCOVERED DATA FROM DISTRIBUTION ---\nconst uncoveredModules = Array.isArray(data.uncoveredModules) ? data.uncoveredModules : [];\nconst uncoveredLessons = Array.isArray(data.uncoveredLessons) ? data.uncoveredLessons : [];\nconst droppedLessonDays = data.droppedLessonDays || 0;\n\n// --- PROGRAM ROUTER DATA ---\nconst programRouterData = $('Check if EntreINC').first().json;\nconst teacherName = programRouterData.teacherName || \"Unknown Teacher\";\nconst teacherEmail = data.teacherEmail || programRouterData.teacherEmail || \"email@example.com\";\nconst previousRecID = data.previousRecID || null;\nconst timestamp = programRouterData.timestamp\n  ? new Date(programRouterData.timestamp)\n  : new Date();\n\n// --- BUILD WEEK STRUCTURE ---\nconst weeks = [];\nconst weekPlaceholders = {};\nconst totalWeeks = parseInt(data.weeksRemaining) || 30;\n\n// Track statistics - use Sets to track unique lesson-day combinations\nconst mustCoverDaySet = new Set();\nconst couldCoverDaySet = new Set();\nconst skipDaySet = new Set();\n\nfor (let weekNum = 1; weekNum <= totalWeeks; weekNum++) {\n  const weekData = weeklySchedule.find(w => w.weekNumber === weekNum);\n\n  if (!weekData) {\n    const emptyWeek = {\n      weekNumber: weekNum,\n      weekTitle: `Week ${weekNum}`,\n      module: \"TBD\",\n      type: \"regular\",\n      mustCover: \"\",\n      couldCover: \"\",\n      skip: \"\"\n    };\n\n    weeks.push(emptyWeek);\n\n    weekPlaceholders[`WEEK_${weekNum}_TITLE`] = emptyWeek.weekTitle;\n    weekPlaceholders[`WEEK_${weekNum}_MODULE`] = emptyWeek.module;\n    weekPlaceholders[`WEEK_${weekNum}_MUST_COVER`] = emptyWeek.mustCover;\n    weekPlaceholders[`WEEK_${weekNum}_COULD_COVER`] = emptyWeek.couldCover;\n    weekPlaceholders[`WEEK_${weekNum}_SKIP`] = emptyWeek.skip;\n\n    continue;\n  }\n\n  const lessonEntries = Array.isArray(weekData.lessonEntries)\n    ? weekData.lessonEntries\n    : [];\n\n  const moduleName =\n    lessonEntries.length > 0\n      ? lessonEntries[0].moduleName || \"TBD\"\n      : \"TBD\";\n\n  const mustCoverLessons = [];\n  const couldCoverLessons = [];\n  const skipLessons = [];\n\n  lessonEntries.forEach(lesson => {\n    const lessonDisplay =\n      lesson.lessonText ||\n      `Lesson ${lesson.moduleNumber}.${lesson.lessonNumber}: ${lesson.lessonTitle}`;\n\n    // Must Cover - GROUP days together\n    if (lesson.mustCoverDays?.length) {\n      const days = lesson.mustCoverDays.sort((a, b) => a - b).join(\", \");\n      const plural = lesson.mustCoverDays.length > 1 ? \"days\" : \"day\";\n      const entry = `${lessonDisplay} (${plural} ${days})`;\n      mustCoverLessons.push(entry);\n\n      // Track each day individually for counting\n      lesson.mustCoverDays.forEach(day => {\n        mustCoverDaySet.add(`${lesson.lessonId}-day${day}`);\n      });\n    }\n\n    // Could Cover - GROUP days together\n    if (lesson.shouldCoverDays?.length) {\n      const days = lesson.shouldCoverDays.sort((a, b) => a - b).join(\", \");\n      const plural = lesson.shouldCoverDays.length > 1 ? \"days\" : \"day\";\n      const entry = `${lessonDisplay} (${plural} ${days})`;\n      couldCoverLessons.push(entry);\n\n      // Track each day individually for counting\n      lesson.shouldCoverDays.forEach(day => {\n        couldCoverDaySet.add(`${lesson.lessonId}-day${day}`);\n      });\n    }\n\n    // Skip - GROUP days together\n    if (lesson.canSkipDays?.length) {\n      const days = lesson.canSkipDays.sort((a, b) => a - b).join(\", \");\n      const plural = lesson.canSkipDays.length > 1 ? \"days\" : \"day\";\n      const entry = `${lessonDisplay} (${plural} ${days})`;\n      skipLessons.push(entry);\n\n      // Track each day individually for counting\n      lesson.canSkipDays.forEach(day => {\n        skipDaySet.add(`${lesson.lessonId}-day${day}`);\n      });\n    }\n  });\n\n  const regularWeek = {\n    weekNumber: weekNum,\n    weekTitle: `Week ${weekNum}`,\n    module: moduleName,\n    type: \"regular\",\n    mustCover: mustCoverLessons.length ? \"- \" + mustCoverLessons.join(\"\\n- \") : \"\",\n    couldCover: couldCoverLessons.length ? \"- \" + couldCoverLessons.join(\"\\n- \") : \"\",\n    skip: skipLessons.length ? \"- \" + skipLessons.join(\"\\n- \") : \"\"\n  };\n\n  weeks.push(regularWeek);\n\n  weekPlaceholders[`WEEK_${weekNum}_TITLE`] = regularWeek.weekTitle;\n  weekPlaceholders[`WEEK_${weekNum}_MODULE`] = regularWeek.module;\n  weekPlaceholders[`WEEK_${weekNum}_MUST_COVER`] = regularWeek.mustCover;\n  weekPlaceholders[`WEEK_${weekNum}_COULD_COVER`] = regularWeek.couldCover;\n  weekPlaceholders[`WEEK_${weekNum}_SKIP`] = regularWeek.skip;\n}\n\n// --- CALCULATE CORRECT SUMMARY COUNTS ---\nconst mustCoverDays = mustCoverDaySet.size;\nconst couldCoverDays = couldCoverDaySet.size;\nconst skipDays = skipDaySet.size;\n\n// Total lessons in schedule = must cover + could cover + skip (what's on the doc)\nconst totalLessonsInSchedule = mustCoverDays + couldCoverDays + skipDays;\n\n// Total lessons to cover = must cover + could cover (excludes skips)\nconst totalLessonsToCover = mustCoverDays + couldCoverDays;\n\n// Total including dropped lessons that didn't fit\nconst totalAllLessonDays = totalLessonsInSchedule + droppedLessonDays;\n\n// Count weeks that actually have content\nconst totalWeeksScheduled = weeks.filter(\n  w => w.type === \"regular\" && (w.mustCover || w.couldCover || w.skip)\n).length;\n\n// --- FINAL OUTPUT ---\nreturn {\n  json: {\n    meta: {\n      title: \"AI Pacing Bot Recommendations\",\n      program: \"ENTREINCEDU\",\n      generatedOn: timestamp.toISOString(),\n      teacherName,\n      teacherEmail,\n      previousRecID,\n      avgMinutesPerWeek: data.avgMinutesPerWeek || 150,\n      weeksRemaining: data.weeksRemaining || totalWeeks,\n      startingLesson: data.currentLesson || \"1.1\",\n      certifications: certifications.join(\", \") || \"None\",\n      mandatoryModules: mandatoryModules.join(\", \") || \"None\",\n      completedModules: completedModules.join(\", \") || \"None\",\n      includeCourseConnections: data.includeCourseConnections || false,\n      skippedModules: skippedModules.join(\", \") || \"None\"\n    },\n\n    weeks,\n\n    summary: {\n      totalModulesIncluded: data.selectedModules?.length || 0,\n      totalModulesSkipped: skippedModules.length,\n\n      totalLessonsScheduled: totalLessonsInSchedule,\n      totalLessonsToCover: totalLessonsToCover,\n      mustCoverLessons: mustCoverDays,\n      couldCoverLessons: couldCoverDays,\n      skippedLessons: skipDays,\n      droppedLessonDays: droppedLessonDays,\n      uncoveredModules: uncoveredModules,\n      uncoveredLessons: uncoveredLessons,\n\n      totalWeeksScheduled: totalWeeksScheduled,\n      sessionsPerWeek: data.sessionsPerWeek\n    },\n\n    placeholders: {\n      TEACHER_NAME: teacherName,\n      TEACHER_EMAIL: teacherEmail,\n      GENERATED_DATE: timestamp.toISOString(),\n      PROGRAM: \"ENTREINCEDU\",\n      AVG_MINUTES_PER_WEEK: data.avgMinutesPerWeek || 150,\n      WEEKS_REMAINING: data.weeksRemaining || totalWeeks,\n      STARTING_LESSON: data.currentLesson || \"1.1\",\n      CERTIFICATIONS: certifications.join(\", \") || \"None\",\n      MANDATORY_MODULES: mandatoryModules.join(\", \") || \"None\",\n      COMPLETED_MODULES: completedModules.join(\", \") || \"None\",\n      COURSE_CONNECTIONS: data.includeCourseConnections ? \"Yes\" : \"No\",\n      SKIPPED_MODULES: skippedModules.join(\", \") || \"None\",\n\n      TOTAL_MODULES_INCLUDED: data.selectedModules?.length || 0,\n      TOTAL_MODULES_SKIPPED: skippedModules.length,\n      TOTAL_LESSONS_SCHEDULED: totalLessonsInSchedule,\n      MUST_COVER_LESSONS: mustCoverDays,\n      MIDDLE_PRIORITY_LESSONS: couldCoverDays,\n      LOWEST_PRIORITY_LESSONS: skipDays,\n      DROPPED_LESSON_DAYS: droppedLessonDays,\n      UNCOVERED_MODULES: uncoveredModules.join(\", \") || \"None\",\n      TOTAL_WEEKS_SCHEDULED: totalWeeksScheduled,\n      AVAILABLE_TEACHING_WEEKS: totalWeeksScheduled,\n\n      ...weekPlaceholders\n    },\n\n    success: true\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1888,
+        224
+      ],
+      "id": "5eab2182-7310-4d87-b121-eb1d910236e0",
+      "name": "EntreINC - Format Output1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      success: true,\n      message: `✅ **Your schedule has been generated!**\n\n📄 **View your Google Doc here:**\n${$('Populate Temple with App Script').first().json.docUrl}\n\nIf you have any questions or would like further support, please reach out to us at **support@unchartedlearning.org**.\n\nBest regards,\n**entreINCedu Team**`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -576,
+        208
+      ],
+      "id": "08923b45-188f-4336-9d89-6c15a7942f72",
+      "name": "End Msg"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================================\n// UPDATED \"COLLECT DATA\" NODE\n// Replaces the existing \"Collect Data\" node\n// Now includes time calculation for returning users\n// ============================================================================\n\nconst item = $input.first().json;\n\n// ============================================================================\n// STEP 1: Parse AI output (existing functionality)\n// ============================================================================\nconst aiRaw = item.output;\n\n// Attempt to extract JSON from ```json ... ``` first\nlet jsonString = null;\n\n// Regex: match ```json ... ``` block\nconst match = aiRaw.match(/```json\\s*([\\s\\S]*?)```/i);\nif (match) {\n  jsonString = match[1].trim();\n} else {\n  // Fallback: maybe the whole response is just JSON\n  jsonString = aiRaw.trim();\n}\n\nlet parsedJSON = null;\nlet parseError = false;\n\ntry {\n  parsedJSON = JSON.parse(jsonString);\n} catch {\n  parseError = true;\n}\n\n// If JSON parsing failed, return error state\nif (parseError || !parsedJSON) {\n  return [{\n    json: {\n      ...item,\n      parsedJSON: null,\n      parseError: true,\n      isComplete: false\n    }\n  }];\n}\n\n// ============================================================================\n// STEP 2: Check if this is a returning user who needs time calculations\n// ============================================================================\nconst isReturningUser = parsedJSON.isReturningUser === true;\nconst hasPreviousData = parsedJSON.previousData && typeof parsedJSON.previousData === 'object';\n\nconsole.log(\"=== COLLECT DATA NODE ===\");\nconsole.log(\"Is returning user:\", isReturningUser);\nconsole.log(\"Has previous data:\", hasPreviousData);\n\n// ============================================================================\n// STEP 3: If NOT a returning user, return parsed data as-is\n// ============================================================================\nif (!isReturningUser || !hasPreviousData) {\n  console.log(\"Not a returning user - no time calculations needed\");\n  return [{\n    json: {\n      ...item,\n      parsedJSON: parsedJSON,\n      parseError: false,\n      isComplete: parsedJSON?.isComplete === true\n    }\n  }];\n}\n\n// ============================================================================\n// STEP 4: RETURNING USER - Calculate time elapsed\n// ============================================================================\nconsole.log(\"=== RETURNING USER DETECTED - CALCULATING TIME ===\");\n\nlet weeksElapsed = 0;\nlet updatedWeeksRemaining = parsedJSON.previousData.weeksRemaining || 0;\nlet updatedMvpPitchWeek = parsedJSON.previousData.mvpPitchWeek || null;\n\ntry {\n  // Parse dates\n  const currentDate = new Date();\n  const previousDate = new Date(parsedJSON.previousData.submissionDate);\n  \n  // Validate previous date\n  if (!isNaN(previousDate.getTime())) {\n    // Calculate time elapsed\n    const millisecondsElapsed = currentDate - previousDate;\n    const daysElapsed = millisecondsElapsed / (1000 * 60 * 60 * 24);\n    weeksElapsed = Math.floor(daysElapsed / 7);\n    \n    // Calculate updated weeks remaining (cannot go below 0)\n    const previousWeeksRemaining = parseInt(parsedJSON.previousData.weeksRemaining) || 0;\n    updatedWeeksRemaining = Math.max(0, previousWeeksRemaining - weeksElapsed);\n    \n    // For INCubatoredu: Update MVP pitch week\n    if (parsedJSON.program === \"INCubatoredu\" && parsedJSON.previousData.mvpPitchWeek !== undefined) {\n      const previousMvpPitchWeek = parseInt(parsedJSON.previousData.mvpPitchWeek) || 0;\n      \n      // If previous MVP week was 0 (already occurred), keep it 0\n      if (previousMvpPitchWeek === 0) {\n        updatedMvpPitchWeek = 0;\n      } else {\n        // Otherwise, subtract elapsed weeks (cannot go below 0)\n        updatedMvpPitchWeek = Math.max(0, previousMvpPitchWeek - weeksElapsed);\n      }\n    }\n    \n    console.log(\"Current date:\", currentDate.toISOString());\n    console.log(\"Previous date:\", previousDate.toISOString());\n    console.log(\"Weeks elapsed:\", weeksElapsed);\n    console.log(\"Updated weeks remaining:\", updatedWeeksRemaining);\n    if (parsedJSON.program === \"INCubatoredu\") {\n      console.log(\"Updated MVP pitch week:\", updatedMvpPitchWeek);\n    }\n  } else {\n    console.warn(\"Invalid previous date - skipping time calculation\");\n  }\n} catch (error) {\n  console.warn(\"Error calculating time elapsed:\", error);\n  // Continue without time calculations\n}\n\n// ============================================================================\n// STEP 5: Update the parsedJSON with calculated time values\n// ============================================================================\nconst enhancedParsedJSON = {\n  ...parsedJSON,\n  \n  // Add calculated time fields\n  weeksElapsed: weeksElapsed,\n  updatedWeeksRemaining: updatedWeeksRemaining,\n  updatedMvpPitchWeek: updatedMvpPitchWeek,\n  \n  // Add calculation metadata\n  calculatedOn: new Date().toISOString(),\n  previousSubmissionDate: parsedJSON.previousData.submissionDate,\n  \n  // Update previousData to include elapsed time\n  previousData: {\n    ...parsedJSON.previousData,\n    weeksElapsedSinceLastSubmission: weeksElapsed\n  }\n};\n\nconsole.log(\"=== TIME CALCULATION COMPLETE ===\");\n\n// ============================================================================\n// STEP 6: Return enhanced data\n// ============================================================================\nreturn [{\n  json: {\n    ...item,\n    parsedJSON: enhancedParsedJSON,\n    parseError: false,\n    isComplete: enhancedParsedJSON.isComplete === true\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3104,
+        16
+      ],
+      "id": "e9fdd36c-b0cb-478d-bc8f-e8977c59afcd",
+      "name": "Collect Data",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\n// Ensure output exists\nif (!item.output || typeof item.output !== 'string') {\n  throw new Error(\"No output string found to parse\");\n}\n\nconst aiRaw = item.output;\n\n// 1️⃣ Attempt to extract JSON from ```json ... ``` block first\nlet jsonString = null;\nconst match = aiRaw.match(/```json\\s*([\\s\\S]*?)```/i);\nif (match) {\n  jsonString = match[1].trim();\n} else {\n  // Fallback: maybe the entire output is just JSON\n  jsonString = aiRaw.trim();\n}\n\n// 2️⃣ Parse JSON\nlet parsed;\ntry {\n  parsed = JSON.parse(jsonString);\n} catch (err) {\n  throw new Error(\"Failed to parse JSON from output field\");\n}\n\n// 3️⃣ Return parsed JSON as top-level fields (same as original code)\nreturn {\n  json: {\n    ...parsed\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2656,
+        0
+      ],
+      "id": "9c688953-6941-46b1-af11-44f2a4fef761",
+      "name": "Format Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "673e57ea-4f43-4c0b-9282-3cb039a7fb37",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "aa6826a0-0850-4be2-8e10-33153279e267",
+              "name": "skippedModules",
+              "value": "={{ $json.skippedModules }}",
+              "type": "array"
+            },
+            {
+              "id": "e7f962d7-5e3a-4802-a5e9-f20193da4a7e",
+              "name": "certifications",
+              "value": "={{ $json.certifications }}",
+              "type": "array"
+            },
+            {
+              "id": "f16fad1c-d92e-4096-84b3-a4e6b6f7a8e6",
+              "name": "currentLesson",
+              "value": "={{ $json.currentLesson }}",
+              "type": "string"
+            },
+            {
+              "id": "ee39e925-de8c-42d3-b563-b6d1be6ff842",
+              "name": "weeksRemaining",
+              "value": "={{ $json.weeksRemaining }}",
+              "type": "string"
+            },
+            {
+              "id": "5c5f58fc-2081-41fd-9a8f-4a10ec97307e",
+              "name": "avgMinutesPerWeek",
+              "value": "={{ $json.avgMinutesPerWeek }}",
+              "type": "number"
+            },
+            {
+              "id": "47306436-d00d-4fbe-97ed-f21d7c15c619",
+              "name": "teacherEmail",
+              "value": "={{ $json.teacherEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "5a7d11ec-33fd-493a-92c4-bac663055b4f",
+              "name": "teacherName",
+              "value": "={{ $json.teacherName }}",
+              "type": "string"
+            },
+            {
+              "id": "8668e6e8-e9ee-4df5-8e78-9ad63bc1c14e",
+              "name": "program",
+              "value": "={{ $json.program }}",
+              "type": "string"
+            },
+            {
+              "id": "2b83e868-4d36-44eb-985d-c06b5b585694",
+              "name": "previousRecID",
+              "value": "={{ $json.previousData.recordId }}",
+              "type": "string"
+            },
+            {
+              "id": "dd64f3b9-da73-4c28-866f-e4eead8a94e9",
+              "name": "completedModules",
+              "value": "={{ $json.completedModules }}",
+              "type": "array"
+            },
+            {
+              "id": "edd67d56-d150-4d87-8471-042db0a7ae2f",
+              "name": "includeCourseConnections",
+              "value": "={{ $json.includeCourseConnections }}",
+              "type": "boolean"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2480,
+        0
+      ],
+      "id": "0794ea57-e749-4f5a-80a0-5111cb49f0ba",
+      "name": "Set Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from the nodes\nconst formatOutput = $('EntreINC - Format Output1').first().json;\nconst copyFile = $input.first().json; // Copy File node output\n\n// Extract meta and placeholders\nconst meta = formatOutput.meta;\nconst placeholders = {\n    ...formatOutput.placeholders,\n    TEMPLATE_DOC_ID: copyFile.id // Include copied Google Doc ID\n};\n\n// Map weeks to a simplified structure for Apps Script\nconst weeks = formatOutput.weeks.map(week => ({\n    weekNumber: week.weekNumber,\n    weekTitle: week.weekTitle,\n    module: week.module,\n    type: week.type,\n    mustCover: week.mustCover ? week.mustCover.split('\\n').map(l => l.replace('- ', '').trim()).filter(Boolean) : [],\n    couldCover: week.couldCover ? week.couldCover.split('\\n').map(l => l.replace('- ', '').trim()).filter(Boolean) : [],\n    skip: week.skip ? week.skip.split('\\n').map(l => l.replace('- ', '').trim()).filter(Boolean) : []  // CHANGED FROM 'optional'\n}));\n\n// Build the final output object\nreturn [\n    {\n        json: {\n            success: formatOutput.success,\n            meta,\n            placeholders,\n            weeks,\n            templateDocId: copyFile.id,\n            teacherName: meta.teacherName,\n            teacherEmail: meta.teacherEmail,\n            program: meta.program,\n            generatedOn: meta.generatedOn,\n            previousRecID: meta.previousRecID,\n            summary: formatOutput.summary\n        }\n    }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1712,
+        224
+      ],
+      "id": "ef93b5eb-670f-4d11-9656-13210172c785",
+      "name": "Format Data for template"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a2e9f0f-1e49-43b7-be00-00d04086ed7c",
+              "leftValue": "={{ $json.program }}",
+              "rightValue": "entreINCedu",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2272,
+        0
+      ],
+      "id": "79638d7e-0031-4653-ac8e-fe2af07ad00f",
+      "name": "Check if EntreINC"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5a2e9f0f-1e49-43b7-be00-00d04086ed7c",
+              "leftValue": "={{ $json.program }}",
+              "rightValue": "INCubatoredu",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1840,
+        816
+      ],
+      "id": "c83d1f0e-2797-4b30-8b67-e51c2c9a48ed",
+      "name": "Check if Incubator"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Incubator",
+        "limit": 200
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1456,
+        800
+      ],
+      "id": "03886a68-f622-4358-a47a-3ddfc4885f29",
+      "name": "Get Incubator rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get ALL items from Supabase database node\nconst allItems = $input.all();\n\n// Extract lessons - Supabase returns array of items\nconst allLessons = allItems.map(item => item.json);\n\n// Filter out invalid entries\nconst validLessons = allLessons.filter(lesson => {\n  // Skip entries with null essential fields\n  if (!lesson || !lesson.Lesson_Sequence || !lesson.Lesson_Title || !lesson.Unit_Number) {\n    return false;\n  }\n  \n  // Skip milestone lessons (handled separately in algorithm)\n  const title = (lesson.Lesson_Title || \"\").toLowerCase();\n  if (title.includes(\"final pitch\")) {\n    return false;\n  }\n  \n  // Skip summary rows (Estimated_Minutes > 1000)\n  if (lesson.Estimated_Minutes > 1000) {\n    return false;\n  }\n  \n  return true;\n});\n\n// Sort by Lesson_Sequence (CRITICAL: maintains linear progression)\nconst sortedLessons = validLessons.sort((a, b) => \n  a.Lesson_Sequence - b.Lesson_Sequence\n);\n\n// Count lessons by milestone relationship\nconst beforeMVP = sortedLessons.filter(l => \n  l.Milestone_Relationship === \"Before MVP\"\n).length;\n\nconst betweenMVPAndFP = sortedLessons.filter(l => \n  l.Milestone_Relationship === \"btwn MVP&FP\"\n).length;\n\nreturn [{\n  json: {\n    lessons: sortedLessons,\n    totalLessons: sortedLessons.length,\n    breakdown: {\n      beforeMVP,\n      betweenMVPAndFP\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1280,
+        800
+      ],
+      "id": "dfcb85a3-5a1c-4d8d-8213-0fdbdf6b0ca1",
+      "name": "Fetch INCubatoredu Lessons from Database"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get teacher input from previous node\nconst inputData = $(\"Set Data for Incubator\").first().json;\n\n// Parse and validate all fields\nconst teacherData = {\n  timestamp: inputData.timestamp || new Date().toISOString(),\n  program: inputData.program || \"INCubatoredu\",\n  teacherName: inputData.teacherName || \"\",\n  teacherEmail: inputData.teacherEmail || \"\",\n  previousRecID: inputData.previousRecID || null,\n  avgMinutesPerWeek: parseInt(inputData.avgMinutesPerWeek) || 0,\n  weeksRemaining: parseInt(inputData.weeksRemaining) || 0,\n  currentLesson: inputData.currentLesson || \"1.1\",\n  mvpPitchWeek: inputData.mvpPitchWeek ? parseInt(inputData.mvpPitchWeek) : 0\n};\n\nreturn [{\n  json: teacherData\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        800
+      ],
+      "id": "40317804-62f1-4167-944d-4330114b4af3",
+      "name": "Parse Teacher Input Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const teacherData = $('Parse Teacher Input Data').first().json;\n\n// Parse current lesson position\nconst currentLesson = teacherData.currentLesson;\nconst [currentUnit, currentLessonNum] = currentLesson.split('.').map(Number);\n\n// Determine if MVP has already occurred\nlet mvpPitchWeek = teacherData.mvpPitchWeek;\nlet mvpAlreadyOccurred = false;\n\n// If teacher entered 0, MVP already happened\nif (mvpPitchWeek === 0) {\n  mvpAlreadyOccurred = true;\n}\n\n// If current position is past Unit 5 (Building Your MVP), MVP has occurred\nif (currentUnit >= 6) {\n  mvpAlreadyOccurred = true;\n  mvpPitchWeek = 0;\n}\n\nreturn [{\n  json: {\n    ...teacherData,\n    mvpPitchWeek,\n    mvpAlreadyOccurred,\n    currentUnit,\n    currentLessonNum\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -896,
+        800
+      ],
+      "id": "a924a45f-161e-4452-9a4d-de795d1f1a02",
+      "name": "Calculate MVP Pitch Week Logic"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Calculate MVP Pitch Week Logic').first().json;\n\nconst weeksRemaining = data.weeksRemaining;\nconst mvpPitchWeek = data.mvpPitchWeek;\nconst mvpAlreadyOccurred = data.mvpAlreadyOccurred;\n\n// HARD-CODED MILESTONE WEEKS (cannot be adjusted)\nlet reservedWeeks = [];\nlet availableWeeks = weeksRemaining;\n\n// ===== FINAL PITCH MILESTONE (3 weeks total) =====\nconst finalPitchWeek = weeksRemaining;\nreservedWeeks.push(finalPitchWeek);\navailableWeeks -= 1;\n\nconst finalPitchPrepWeek2 = weeksRemaining - 1;\nreservedWeeks.push(finalPitchPrepWeek2);\navailableWeeks -= 1;\n\nconst finalPitchPrepWeek1 = weeksRemaining - 2;\nreservedWeeks.push(finalPitchPrepWeek1);\navailableWeeks -= 1;\n\n// ===== MVP PITCH MILESTONE (2 weeks total, if not occurred) =====\nlet mvpPitchPrepWeek = null;\n\nif (!mvpAlreadyOccurred && mvpPitchWeek > 0) {\n  // MVP Pitch week\n  reservedWeeks.push(mvpPitchWeek);\n  availableWeeks -= 1;\n  \n  // MVP Pitch Prep (week before MVP)\n  if (mvpPitchWeek > 1) {\n    mvpPitchPrepWeek = mvpPitchWeek - 1;\n    reservedWeeks.push(mvpPitchPrepWeek);\n    availableWeeks -= 1;\n  }\n}\n\n// Sort reserved weeks\nreservedWeeks.sort((a, b) => a - b);\n\n// Calculate total available minutes\nconst totalAvailableMinutes = availableWeeks * data.avgMinutesPerWeek;\n\nreturn [{\n  json: {\n    ...data,\n    totalWeeksRemaining: weeksRemaining,\n    availableTeachingWeeks: availableWeeks,\n    reservedWeeks,\n    totalAvailableMinutes,\n    \n    // Milestone references\n    finalPitchWeek,\n    finalPitchPrepWeek1,\n    finalPitchPrepWeek2,\n    mvpPitchPrepWeek,\n    \n    // For debugging\n    milestoneBreakdown: {\n      finalPitch: finalPitchWeek,\n      finalPitchPrep: [finalPitchPrepWeek1, finalPitchPrepWeek2],\n      mvpPitch: mvpAlreadyOccurred ? \"Already occurred\" : mvpPitchWeek,\n      mvpPitchPrep: mvpAlreadyOccurred ? \"Already occurred\" : mvpPitchPrepWeek\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -720,
+        800
+      ],
+      "id": "c8d353c7-e5d8-4c79-83e7-ccd19e23f3f6",
+      "name": "Calculate Available Teaching Weeks"
+    },
+    {
+      "parameters": {
+        "jsCode": "const calculatedData = $('Calculate Available Teaching Weeks').first().json;\nconst lessonsData = $('Fetch INCubatoredu Lessons from Database').first().json;\n\nconst currentLesson = calculatedData.currentLesson;\n\n// Find current lesson's sequence number\nconst currentLessonObj = lessonsData.lessons.find(lesson => {\n  const lessonTitle = lesson.Lesson_Title || \"\";\n  // Extract lesson number (e.g., \"1.1\", \"2.3\")\n  const match = lessonTitle.match(/(\\d+)\\.(\\d+)/);\n  if (match) {\n    const lessonNum = match[0]; // e.g., \"1.1\"\n    return lessonNum === currentLesson;\n  }\n  return false;\n});\n\nconst currentSequence = currentLessonObj ? currentLessonObj.Lesson_Sequence : 1;\n\n// Filter remaining lessons (from current position onwards)\nconst remainingLessons = lessonsData.lessons.filter(lesson => \n  lesson.Lesson_Sequence >= currentSequence\n);\n\n// Separate by milestone relationship\nconst beforeMVP = remainingLessons.filter(l => \n  l.Milestone_Relationship === \"Before MVP\"\n);\n\nconst betweenMVPAndFP = remainingLessons.filter(l => \n  l.Milestone_Relationship === \"btwn MVP&FP\"\n);\n\nreturn [{\n  json: {\n    ...calculatedData,\n    remainingLessons,\n    totalRemainingLessons: remainingLessons.length,\n    currentSequence,\n    \n    // Explicitly pass separated lesson arrays\n    beforeMVPLessons: beforeMVP,\n    betweenMVPAndFPLessons: betweenMVPAndFP,\n    \n    lessonsByMilestone: {\n      beforeMVP: beforeMVP.length,\n      betweenMVPAndFP: betweenMVPAndFP.length\n    }\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        800
+      ],
+      "id": "81266a99-9847-4412-9b60-baeb33eb2491",
+      "name": "Filter Lessons Based on Current Position"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      success: true,\n      message: `✅ **Your schedule has been generated!**\n\n📄 **View your Google Doc here:**\n${$('Populate Temple with App Script1').first().json.docUrl}\n\nIf you have any questions or would like further support, please reach out to us at **support@unchartedlearning.org**.\n\nBest regards,\n**INCubatoredu Team**`\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        1040
+      ],
+      "id": "d046beda-67c9-47cb-96d4-ec91ce938ddd",
+      "name": "End Msg1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from format output node\nconst formatOutput = $('INCubatoredu - Format Output').first().json;\nconst copyFile = $input.first().json; // Google Doc copy\n\n// Extract meta and placeholders\nconst meta = formatOutput.meta;\nconst placeholders = {\n  ...formatOutput.placeholders,\n  TEMPLATE_DOC_ID: copyFile.id\n};\n\n// Map weeks to simplified structure (matches EntreINC format)\nconst weeks = formatOutput.weeks.map(week => ({\n  weekNumber: week.weekNumber,\n  weekTitle: week.weekTitle,\n  module: week.module,\n  type: week.type,\n  mustCover: week.mustCover ? (\n    typeof week.mustCover === 'string' \n      ? week.mustCover.split('\\n').map(l => l.replace('- ', '').trim()).filter(Boolean)\n      : []\n  ) : [],\n  couldCover: week.couldCover ? (\n    typeof week.couldCover === 'string'\n      ? week.couldCover.split('\\n').map(l => l.replace('- ', '').trim()).filter(Boolean)\n      : []\n  ) : [],\n  skip: week.skip ? (\n    typeof week.skip === 'string'\n      ? week.skip.split('\\n').map(l => l.replace('- ', '').trim()).filter(Boolean)\n      : []\n  ) : []\n}));\n\n// Build final output (matches EntreINC structure)\nreturn [\n  {\n    json: {\n      success: formatOutput.success,\n      meta,\n      placeholders,\n      weeks,\n      templateDocId: copyFile.id,\n      teacherName: meta.teacherName,\n      teacherEmail: meta.teacherEmail,\n      program: meta.program,\n      generatedOn: meta.generatedOn,\n      summary: {\n        ...formatOutput.summary,\n        mvpPitchWeek: meta.mvpPitchWeek,           \n        finalPitchWeek: meta.finalPitchWeek        \n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1040
+      ],
+      "id": "ae0957b7-621f-43a6-b1fd-e65b9bbbea66",
+      "name": "Prepare Data for Google Doc"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "673e57ea-4f43-4c0b-9282-3cb039a7fb37",
+              "name": "timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "aa6826a0-0850-4be2-8e10-33153279e267",
+              "name": "skippedModules",
+              "value": "={{ $json.skippedModules }}",
+              "type": "array"
+            },
+            {
+              "id": "e7f962d7-5e3a-4802-a5e9-f20193da4a7e",
+              "name": "certifications",
+              "value": "={{ $json.certifications }}",
+              "type": "array"
+            },
+            {
+              "id": "f16fad1c-d92e-4096-84b3-a4e6b6f7a8e6",
+              "name": "currentLesson",
+              "value": "={{ $json.currentLesson }}",
+              "type": "string"
+            },
+            {
+              "id": "ee39e925-de8c-42d3-b563-b6d1be6ff842",
+              "name": "weeksRemaining",
+              "value": "={{ $json.weeksRemaining }}",
+              "type": "string"
+            },
+            {
+              "id": "5c5f58fc-2081-41fd-9a8f-4a10ec97307e",
+              "name": "avgMinutesPerWeek",
+              "value": "={{ $json.avgMinutesPerWeek }}",
+              "type": "number"
+            },
+            {
+              "id": "47306436-d00d-4fbe-97ed-f21d7c15c619",
+              "name": "teacherEmail",
+              "value": "={{ $json.teacherEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "5a7d11ec-33fd-493a-92c4-bac663055b4f",
+              "name": "teacherName",
+              "value": "={{ $json.teacherName }}",
+              "type": "string"
+            },
+            {
+              "id": "8668e6e8-e9ee-4df5-8e78-9ad63bc1c14e",
+              "name": "program",
+              "value": "={{ $json.program }}",
+              "type": "string"
+            },
+            {
+              "id": "6e6a2126-91ed-44f4-b895-f146176f75b8",
+              "name": "mvpPitchWeek",
+              "value": "={{ $('Format Data').item.json.mvpPitchWeek }}",
+              "type": "number"
+            },
+            {
+              "id": "4267b71a-bd30-4f83-8fa2-ff177c94ef52",
+              "name": "previousRecID",
+              "value": "={{ $json.previousRecID }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1632,
+        800
+      ],
+      "id": "6a7c2823-9c05-4e62-9b10-57788b7461ee",
+      "name": "Set Data for Incubator"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ============================================================\n// UPDATED: Apply Three-Tier Priority System & Distribute Lessons\n// \n// CHANGES:\n// - Track uncovered lessons/modules that were fully discarded\n// - Attach skip days to their X.Y lesson's week (exact match only)\n// - Drop lessons cleanly if their X.Y never had must-covers\n// - Pass uncovered data downstream for summary\n// ============================================================\n\nconst data = $('Filter Lessons Based on Current Position').first().json;\n\nconst avgMinutesPerWeek = data.avgMinutesPerWeek;\nconst AVG_MINUTES_PER_SESSION = 50;\nconst n = Math.floor(avgMinutesPerWeek / AVG_MINUTES_PER_SESSION);\n\nconst reservedWeeks = data.reservedWeeks || [];\nconst totalWeeksRemaining = data.totalWeeksRemaining;\nconst mvpAlreadyOccurred = data.mvpAlreadyOccurred;\nconst mvpPitchWeek = data.mvpPitchWeek;\n\nconsole.log('========================================');\nconsole.log('INCUBATOREDU - SCHEDULING LOGIC v2');\nconsole.log(`avgMinutesPerWeek : ${avgMinutesPerWeek}`);\nconsole.log(`n (must-covers/wk): floor(${avgMinutesPerWeek} / 50) = ${n}`);\nconsole.log('========================================');\n\n// ======================================================\n// HELPERS\n// ======================================================\nfunction extractLessonNumber(title) {\n  const match = (title || '').match(/^(\\d+\\.\\d+)/);\n  return match ? match[1] : '';\n}\n\nfunction extractDayNumber(title) {\n  const match = (title || '').match(/Day (\\d+)/i);\n  return match ? parseInt(match[1]) : 1;\n}\n\n// Normalize a raw DB lesson row into the shape expected\n// by the \"INCubatoredu - Format Output\" node\nfunction normalize(lesson, tier) {\n  const title = lesson.Lesson_Title || '';\n  return {\n    lessonTitle          : title,\n    lessonNumber         : extractLessonNumber(title),\n    dayNumber            : extractDayNumber(title),\n    lessonSequence       : lesson.Lesson_Sequence,\n    unitNumber           : lesson.Unit_Number,\n    unitName             : lesson.Unit_Name,\n    priorityRanking      : lesson.Priority_Ranking,\n    milestoneRelationship: lesson.Milestone_Relationship,\n    estimatedMinutes     : lesson.Estimated_Minutes || 50,\n    notes                : lesson.Notes,\n    id                   : lesson.id,\n    priorityTier         : tier,\n    Lesson_Title         : title,\n    Lesson_Sequence      : lesson.Lesson_Sequence,\n    Unit_Number          : lesson.Unit_Number,\n    Unit_Name            : lesson.Unit_Name,\n    Priority_Ranking     : lesson.Priority_Ranking,\n    Milestone_Relationship: lesson.Milestone_Relationship,\n    Estimated_Minutes    : lesson.Estimated_Minutes || 50,\n    Notes                : lesson.Notes\n  };\n}\n\n// ======================================================\n// STEP 1 — BUILD AVAILABLE WEEK LISTS PER PHASE\n// ======================================================\n\nconst beforeMVPWeekNumbers = [];\nconst betweenMVPAndFPWeekNumbers = [];\n\nif (!mvpAlreadyOccurred) {\n  for (let w = 1; w < mvpPitchWeek - 1; w++) {\n    if (!reservedWeeks.includes(w)) beforeMVPWeekNumbers.push(w);\n  }\n}\n\nconst startWeekAfterMVP = mvpAlreadyOccurred ? 1 : mvpPitchWeek + 1;\nfor (let w = startWeekAfterMVP; w <= totalWeeksRemaining; w++) {\n  if (!reservedWeeks.includes(w)) betweenMVPAndFPWeekNumbers.push(w);\n}\n\nconsole.log(`Before MVP available weeks : ${beforeMVPWeekNumbers.length}`);\nconsole.log(`Between MVP & FP avail weeks : ${betweenMVPAndFPWeekNumbers.length}`);\n\n// ======================================================\n// STEP 2 — CALCULATE MUST-COVER SLOT BUDGETS PER PHASE\n// ======================================================\n\nconst beforeMVPSlots = n * beforeMVPWeekNumbers.length;\nconst betweenMVPSlots = n * betweenMVPAndFPWeekNumbers.length;\n\nconsole.log(`Before MVP must-cover slots: ${n} × ${beforeMVPWeekNumbers.length} = ${beforeMVPSlots}`);\nconsole.log(`Between MVP&FP must-cover slots: ${n} × ${betweenMVPAndFPWeekNumbers.length} = ${betweenMVPSlots}`);\n\n// ======================================================\n// STEP 3 — SELECT MUST-COVER LESSONS PER PHASE\n// ======================================================\n\nfunction selectMustCover(lessons, slotCount) {\n  if (!lessons || lessons.length === 0) {\n    return { mustCover: [], discarded: [] };\n  }\n\n  const sorted = [...lessons].sort((a, b) => {\n    if (b.Priority_Ranking !== a.Priority_Ranking) {\n      return b.Priority_Ranking - a.Priority_Ranking;\n    }\n    return a.Lesson_Sequence - b.Lesson_Sequence;\n  });\n\n  const mustCover = sorted.slice(0, slotCount);\n  const discarded = sorted.slice(slotCount);\n\n  console.log(`  selectMustCover: ${lessons.length} lessons, ${slotCount} slots → ${mustCover.length} must, ${discarded.length} discarded`);\n  return { mustCover, discarded };\n}\n\nconst beforeMVPLessons = data.beforeMVPLessons || [];\nconst betweenMVPAndFPLessons = data.betweenMVPAndFPLessons || [];\n\nconsole.log('\\n--- Before MVP selection ---');\nconst { mustCover: beforeMVPMust, discarded: beforeMVPDiscarded } =\n  selectMustCover(beforeMVPLessons, beforeMVPSlots);\n\nconsole.log('\\n--- Between MVP & FP selection ---');\nconst { mustCover: betweenMVPMust, discarded: betweenMVPDiscarded } =\n  selectMustCover(betweenMVPAndFPLessons, betweenMVPSlots);\n\n// ======================================================\n// STEP 4 — DISTRIBUTE LESSONS INTO WEEKS\n// ======================================================\n\nfunction distributeToWeeks(mustCoverLessons, discardedLessons, weekNumbers, mustCoversPerWeek) {\n  if (!weekNumbers || weekNumbers.length === 0) return { schedule: [], droppedCount: 0, uncoveredLessons: new Set(), uncoveredUnits: new Set() };\n\n  // Sort must-covers by Lesson_Sequence\n  const mustQueue = [...mustCoverLessons].sort((a, b) => a.Lesson_Sequence - b.Lesson_Sequence);\n\n  // Index ALL lessons by X.Y lesson number for gap checking\n  const allLessonsByLessonNum = {};\n  [...mustCoverLessons, ...discardedLessons].forEach(lesson => {\n    const key = extractLessonNumber(lesson.Lesson_Title || '');\n    if (key) {\n      if (!allLessonsByLessonNum[key]) allLessonsByLessonNum[key] = [];\n      allLessonsByLessonNum[key].push(lesson);\n    }\n  });\n  Object.values(allLessonsByLessonNum).forEach(arr =>\n    arr.sort((a, b) => a.Lesson_Sequence - b.Lesson_Sequence)\n  );\n\n  // Index discarded lessons by X.Y lesson number\n  const discardedByLessonNum = {};\n  discardedLessons.forEach(lesson => {\n    const key = extractLessonNumber(lesson.Lesson_Title || '');\n    if (key) {\n      if (!discardedByLessonNum[key]) discardedByLessonNum[key] = [];\n      discardedByLessonNum[key].push(lesson);\n    }\n  });\n\n  const weeklySchedule = [];\n  const weekByNumber = {};\n  let mustIndex = 0;\n  const usedDiscardedIds = new Set();\n  const placedMustSequences = new Set();\n  const lessonNumToWeekNum = {};\n\n  for (const weekNum of weekNumbers) {\n    const weekMustCover = [];\n    for (let j = 0; j < mustCoversPerWeek && mustIndex < mustQueue.length; j++) {\n      const lesson = mustQueue[mustIndex];\n      weekMustCover.push(lesson);\n\n      const lNum = extractLessonNumber(lesson.Lesson_Title || '');\n      if (lNum && !lessonNumToWeekNum[lNum]) {\n        lessonNumToWeekNum[lNum] = weekNum;\n      }\n\n      mustIndex++;\n    }\n\n    if (weekMustCover.length === 0) continue;\n\n    const thisWeekMustSeqs = new Set(weekMustCover.map(l => l.Lesson_Sequence));\n    const allPlacedSoFar = new Set([...placedMustSequences, ...thisWeekMustSeqs]);\n\n    const lessonNumsThisWeek = new Set(\n      weekMustCover.map(l => extractLessonNumber(l.Lesson_Title || ''))\n    );\n\n    function isEligible(candidate) {\n      const key = extractLessonNumber(candidate.Lesson_Title || '');\n      const candidateSeq = candidate.Lesson_Sequence;\n      const group = allLessonsByLessonNum[key] || [];\n\n      for (const lesson of group) {\n        if (lesson.Lesson_Sequence >= candidateSeq) break;\n        if (!allPlacedSoFar.has(lesson.Lesson_Sequence)) {\n          return false;\n        }\n      }\n      return true;\n    }\n\n    const eligibleDiscarded = [];\n    lessonNumsThisWeek.forEach(lessonNum => {\n      (discardedByLessonNum[lessonNum] || []).forEach(lesson => {\n        if (!usedDiscardedIds.has(lesson.id) && isEligible(lesson)) {\n          eligibleDiscarded.push(lesson);\n        }\n      });\n    });\n\n    eligibleDiscarded.sort((a, b) => {\n      if (b.Priority_Ranking !== a.Priority_Ranking) return b.Priority_Ranking - a.Priority_Ranking;\n      return a.Lesson_Sequence - b.Lesson_Sequence;\n    });\n\n    const couldCover = [];\n    const skip = [];\n\n    if (eligibleDiscarded.length > 0) {\n      const topPriority = eligibleDiscarded[0].Priority_Ranking;\n      eligibleDiscarded.forEach(lesson => {\n        if (lesson.Priority_Ranking === topPriority) {\n          couldCover.push(lesson);\n        } else {\n          skip.push(lesson);\n        }\n        usedDiscardedIds.add(lesson.id);\n      });\n    }\n\n    thisWeekMustSeqs.forEach(seq => placedMustSequences.add(seq));\n\n    const allLessonsThisWeek = [\n      ...weekMustCover.map(l => normalize(l, 'must-cover')),\n      ...couldCover.map(l => normalize(l, 'could-cover')),\n      ...skip.map(l => normalize(l, 'can-skip'))\n    ];\n\n    const weekObj = {\n      weekNumber   : weekNum,\n      lessons      : allLessonsThisWeek,\n      totalMinutes : weekMustCover.length * AVG_MINUTES_PER_SESSION\n    };\n\n    weeklySchedule.push(weekObj);\n    weekByNumber[weekNum] = weekObj;\n  }\n\n  // ── Distribute remaining discarded ──\n  // Only attach if exact X.Y had must-covers; otherwise drop\n  const uncoveredLessons = new Set();\n  const uncoveredUnits = new Set();\n  let droppedCount = 0;\n\n  discardedLessons.forEach(lesson => {\n    if (usedDiscardedIds.has(lesson.id)) return;\n\n    const lNum = extractLessonNumber(lesson.Lesson_Title || '');\n\n    if (lNum && lessonNumToWeekNum[lNum] && weekByNumber[lessonNumToWeekNum[lNum]]) {\n      const targetWeek = weekByNumber[lessonNumToWeekNum[lNum]];\n      targetWeek.lessons.push(normalize(lesson, 'can-skip'));\n      usedDiscardedIds.add(lesson.id);\n    } else {\n      // DROP\n      uncoveredLessons.add(`${lNum}: ${(lesson.Lesson_Title || '').replace(/Day \\d+\\s*/i, '').trim()}`);\n      uncoveredUnits.add(lesson.Unit_Name || '');\n      droppedCount++;\n      usedDiscardedIds.add(lesson.id);\n    }\n  });\n\n  return { schedule: weeklySchedule, droppedCount, uncoveredLessons, uncoveredUnits };\n}\n\n// ======================================================\n// STEP 5 — RUN DISTRIBUTION FOR EACH PHASE\n// ======================================================\n\nconsole.log('\\n--- Before MVP distribution ---');\nconst beforeMVPResult = mvpAlreadyOccurred\n  ? { schedule: [], droppedCount: 0, uncoveredLessons: new Set(), uncoveredUnits: new Set() }\n  : distributeToWeeks(beforeMVPMust, beforeMVPDiscarded, beforeMVPWeekNumbers, n);\n\nconsole.log('\\n--- Between MVP & FP distribution ---');\nconst betweenMVPResult = distributeToWeeks(\n  betweenMVPMust, betweenMVPDiscarded, betweenMVPAndFPWeekNumbers, n\n);\n\nconst weeklySchedule = [...beforeMVPResult.schedule, ...betweenMVPResult.schedule];\n\n// Combine uncovered data\nconst allUncoveredLessons = new Set([...beforeMVPResult.uncoveredLessons, ...betweenMVPResult.uncoveredLessons]);\nconst allUncoveredUnits = new Set([...beforeMVPResult.uncoveredUnits, ...betweenMVPResult.uncoveredUnits]);\nconst totalDroppedCount = beforeMVPResult.droppedCount + betweenMVPResult.droppedCount;\n\n// ======================================================\n// STEP 6 — FINAL COUNTS & OUTPUT\n// ======================================================\n\nconst allScheduled = weeklySchedule.flatMap(w => w.lessons);\n\nconst priorityCounts = {\n  mustCover  : allScheduled.filter(l => l.priorityTier === 'must-cover').length,\n  couldCover : allScheduled.filter(l => l.priorityTier === 'could-cover').length,\n  canSkip    : allScheduled.filter(l => l.priorityTier === 'can-skip').length,\n  total      : allScheduled.length\n};\n\nconsole.log('\\n========================================');\nconsole.log('FINAL DISTRIBUTION');\nconsole.log(`Must Cover : ${priorityCounts.mustCover}`);\nconsole.log(`Could Cover: ${priorityCounts.couldCover}`);\nconsole.log(`Skip       : ${priorityCounts.canSkip}`);\nconsole.log(`Dropped    : ${totalDroppedCount}`);\nconsole.log(`Total      : ${priorityCounts.total}`);\nconsole.log(`Weeks scheduled: ${weeklySchedule.length}`);\nconsole.log(`Uncovered units: ${[...allUncoveredUnits].join(', ')}`);\nconsole.log('========================================');\n\nreturn [{\n  json: {\n    ...data,\n    weeklySchedule,\n    totalWeeksScheduled  : weeklySchedule.length,\n    sessionsPerWeek      : n,\n    coverageRatio        : 1,\n    priorityCounts,\n    droppedLessonDays    : totalDroppedCount,\n    uncoveredLessons     : [...allUncoveredLessons],\n    uncoveredUnits       : [...allUncoveredUnits],\n    minutesSummary: {\n      totalAvailableMinutes  : data.totalAvailableMinutes,\n      totalMinutesNeeded     : allScheduled.length * AVG_MINUTES_PER_SESSION,\n      totalScheduledMinutes  : priorityCounts.mustCover * AVG_MINUTES_PER_SESSION,\n      utilizationPercentage  : data.totalAvailableMinutes > 0\n        ? Math.round(priorityCounts.mustCover * AVG_MINUTES_PER_SESSION / data.totalAvailableMinutes * 100)\n        : 0\n    },\n    phaseBreakdown: {\n      beforeMVP: {\n        weeks  : beforeMVPWeekNumbers.length,\n        lessons: beforeMVPMust.length,\n        slots  : beforeMVPSlots\n      },\n      betweenMVPAndFP: {\n        weeks  : betweenMVPAndFPWeekNumbers.length,\n        lessons: betweenMVPMust.length,\n        slots  : betweenMVPSlots\n      }\n    },\n    success: true\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        800
+      ],
+      "id": "5439240d-96e4-4662-adc6-8a3fdf156d57",
+      "name": "Apply Three-Tier Priority System & Distribute Lessons"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Apply Three-Tier Priority System & Distribute Lessons').first().json;\nconst timestamp = new Date(data.timestamp);\n\n// Get dropped/uncovered data from distribution\nconst droppedLessonDays = data.droppedLessonDays || 0;\nconst uncoveredLessons = Array.isArray(data.uncoveredLessons) ? data.uncoveredLessons : [];\nconst uncoveredUnits = Array.isArray(data.uncoveredUnits) ? data.uncoveredUnits : [];\n\nconst weeks = [];\n\nfor (let weekNum = 1; weekNum <= data.totalWeeksRemaining; weekNum++) {\n\n  // ===== MVP PITCH PREP =====\n  if (!data.mvpAlreadyOccurred && weekNum === data.mvpPitchPrepWeek) {\n    weeks.push({\n      weekNumber: weekNum,\n      weekTitle: \"\",\n      module: \"Building Your MVP\",\n      type: \"milestone\",\n      mustCover: \"Lesson 5.4: Prep For MVP Pitch (days 1, 2, 3, 4, 5)\",\n      couldCover: \"Lesson 5.4: Prep For MVP Pitch (day 6)\",\n      skip: \"\"\n    });\n    continue;\n  }\n\n  // ===== MVP PITCH =====\n  if (!data.mvpAlreadyOccurred && weekNum === data.mvpPitchWeek) {\n    weeks.push({\n      weekNumber: weekNum,\n      weekTitle: \"\",\n      module: \"Building Your MVP\",\n      type: \"milestone\",\n      mustCover: \"Lesson 5.5: MVP Pitch (days 1, 2)\",\n      couldCover: \"\",\n      skip: \"\"\n    });\n    continue;\n  }\n\n  // ===== FINAL PITCH PREP 1 =====\n  if (weekNum === data.finalPitchPrepWeek1) {\n    weeks.push({\n      weekNumber: weekNum,\n      weekTitle: \"\",\n      module: \"Pitch Your Story\",\n      type: \"milestone\",\n      mustCover: \"Lesson 8.3: Prepping For Pitch (days 1, 2, 3, 4, 5)\",\n      couldCover: \"Lesson 8.3: Prepping For Pitch (day 6)\",\n      skip: \"\"\n    });\n    continue;\n  }\n\n  // ===== FINAL PITCH PREP 2 =====\n  if (weekNum === data.finalPitchPrepWeek2) {\n    weeks.push({\n      weekNumber: weekNum,\n      weekTitle: \"\",\n      module: \"Pitch Your Story\",\n      type: \"milestone\",\n      mustCover: \"Lesson 8.3: Prepping For Pitch (days 7, 8, 9, 10)\",\n      couldCover: \"Lesson 8.3: Prepping For Pitch (days 11, 12)\",\n      skip: \"\"\n    });\n    continue;\n  }\n\n  // ===== FINAL PITCH =====\n  if (weekNum === data.finalPitchWeek) {\n    weeks.push({\n      weekNumber: weekNum,\n      weekTitle: \"\",\n      module: \"Pitch Your Story\",\n      type: \"milestone\",\n      mustCover: \"Final Pitch\",\n      couldCover: \"\",\n      skip: \"\"\n    });\n    continue;\n  }\n\n  // ===== REGULAR TEACHING WEEK =====\n  const weekData = data.weeklySchedule.find(w => w.weekNumber === weekNum);\n\n  if (!weekData) {\n    weeks.push({\n      weekNumber: weekNum,\n      weekTitle: \"\",\n      module: \"TBD\",\n      type: \"regular\",\n      mustCover: \"\",\n      couldCover: \"\",\n      skip: \"\"\n    });\n    continue;\n  }\n\n  const moduleName = weekData.lessons.length > 0 ? weekData.lessons[0].unitName : \"TBD\";\n\n  // ===== GROUP DAYS BY LESSON NUMBER AND PRIORITY =====\n  const lessonMap = {};\n\n  weekData.lessons.forEach(lesson => {\n    const title = lesson.lessonTitle || \"\";\n\n    const lessonMatch = title.match(/^(\\d+\\.\\d+)/);\n    const lessonNumber = lessonMatch ? lessonMatch[1] : \"\";\n\n    const dayMatch = title.match(/Day (\\d+)/i);\n    const dayNumber = dayMatch ? parseInt(dayMatch[1]) : 1;\n\n    const nameMatch = title.match(/Day \\d+\\s+(.+)/i);\n    const lessonName = nameMatch ? nameMatch[1].trim() : title;\n\n    const lessonKey = lessonNumber;\n\n    if (!lessonMap[lessonKey]) {\n      lessonMap[lessonKey] = {\n        lessonNumber,\n        lessonName,\n        mustCoverDays: [],\n        couldCoverDays: [],\n        canSkipDays: []\n      };\n    }\n\n    if (lesson.priorityTier === \"must-cover\") {\n      lessonMap[lessonKey].mustCoverDays.push(dayNumber);\n    } else if (lesson.priorityTier === \"could-cover\") {\n      lessonMap[lessonKey].couldCoverDays.push(dayNumber);\n    } else {\n      lessonMap[lessonKey].canSkipDays.push(dayNumber);\n    }\n  });\n\n  const mustCoverLessons = [];\n  const couldCoverLessons = [];\n  const canSkipLessons = [];\n\n  const sortedLessons = Object.values(lessonMap).sort((a, b) => {\n    const [aUnit, aLesson] = a.lessonNumber.split('.').map(Number);\n    const [bUnit, bLesson] = b.lessonNumber.split('.').map(Number);\n\n    if (aUnit !== bUnit) return aUnit - bUnit;\n    return aLesson - bLesson;\n  });\n\n  sortedLessons.forEach(lesson => {\n    if (lesson.mustCoverDays.length > 0) {\n      const days = lesson.mustCoverDays.sort((a, b) => a - b).join(\", \");\n      const plural = lesson.mustCoverDays.length > 1 ? \"days\" : \"day\";\n      mustCoverLessons.push(`Lesson ${lesson.lessonNumber}: ${lesson.lessonName} (${plural} ${days})`);\n    }\n\n    if (lesson.couldCoverDays.length > 0) {\n      const days = lesson.couldCoverDays.sort((a, b) => a - b).join(\", \");\n      const plural = lesson.couldCoverDays.length > 1 ? \"days\" : \"day\";\n      couldCoverLessons.push(`Lesson ${lesson.lessonNumber}: ${lesson.lessonName} (${plural} ${days})`);\n    }\n\n    if (lesson.canSkipDays.length > 0) {\n      const days = lesson.canSkipDays.sort((a, b) => a - b).join(\", \");\n      const plural = lesson.canSkipDays.length > 1 ? \"days\" : \"day\";\n      canSkipLessons.push(`Lesson ${lesson.lessonNumber}: ${lesson.lessonName} (${plural} ${days})`);\n    }\n  });\n\n  weeks.push({\n    weekNumber: weekNum,\n    weekTitle: \"\",\n    module: moduleName,\n    type: \"regular\",\n    mustCover: mustCoverLessons.join(\"\\n\"),\n    couldCover: couldCoverLessons.join(\"\\n\"),\n    skip: canSkipLessons.join(\"\\n\")\n  });\n}\n\n// ===== COUNT ACTUAL LESSON DAYS (EXCLUDE MILESTONES) =====\nlet mustCoverDayCount = 0;\nlet couldCoverDayCount = 0;\nlet skipDayCount = 0;\n\nweeks.forEach(week => {\n  // Count milestone weeks too now since they have real lesson data\n  const allContent = [week.mustCover, week.couldCover, week.skip];\n\n  allContent.forEach((content, idx) => {\n    if (!content) return;\n    const lines = content.split('\\n').filter(line => line.trim());\n    lines.forEach(line => {\n      const dayMatch = line.match(/\\(days? ([\\d,\\s]+)\\)/);\n      if (dayMatch) {\n        const days = dayMatch[1].split(',').map(d => d.trim()).filter(Boolean);\n        if (idx === 0) mustCoverDayCount += days.length;\n        else if (idx === 1) couldCoverDayCount += days.length;\n        else skipDayCount += days.length;\n      } else if (line.trim() === \"Final Pitch\") {\n        // Final Pitch is 1 must-cover day\n        if (idx === 0) mustCoverDayCount += 1;\n      }\n    });\n  });\n});\n\n// Calculate totals\nconst totalLessonsInSchedule = mustCoverDayCount + couldCoverDayCount + skipDayCount;\nconst totalLessonsToCover = mustCoverDayCount + couldCoverDayCount;\nconst totalAllLessonDays = totalLessonsInSchedule + droppedLessonDays;\n\nconsole.log(`\\n===== LESSON DAY COUNTS =====`);\nconsole.log(`Must Cover Days: ${mustCoverDayCount}`);\nconsole.log(`Could Cover Days: ${couldCoverDayCount}`);\nconsole.log(`Skip Days (in schedule): ${skipDayCount}`);\nconsole.log(`Dropped Days: ${droppedLessonDays}`);\nconsole.log(`Total in schedule: ${totalLessonsInSchedule}`);\nconsole.log(`Total all: ${totalAllLessonDays}`);\n\n// ===== BUILD PLACEHOLDERS =====\nconst placeholders = {\n  TEACHER_NAME: data.teacherName,\n  TEACHER_EMAIL: data.teacherEmail,\n  GENERATED_DATE: timestamp.toISOString().split('T')[0],\n  PROGRAM: \"INCUBATOREDU\",\n  AVG_MINUTES_PER_WEEK: data.avgMinutesPerWeek,\n  WEEKS_REMAINING: data.totalWeeksRemaining,\n  STARTING_LESSON: data.currentLesson,\n  MVP_PITCH_WEEK: data.mvpAlreadyOccurred ? \"Already occurred\" : `Week ${data.mvpPitchWeek}`,\n  FINAL_PITCH_WEEK: `Week ${data.finalPitchWeek}`,\n\n  TOTAL_LESSONS_SCHEDULED: totalLessonsInSchedule,\n  TOTAL_LESSONS_TO_COVER: totalLessonsToCover,\n  MUST_COVER_LESSONS: mustCoverDayCount,\n  COULD_COVER_LESSONS: couldCoverDayCount,\n  CAN_SKIP_LESSONS: skipDayCount,\n  DROPPED_LESSON_DAYS: droppedLessonDays,\n  UNCOVERED_LESSONS: uncoveredLessons.join(\", \") || \"None\",\n  UNCOVERED_UNITS: uncoveredUnits.join(\", \") || \"None\",\n  TOTAL_WEEKS_SCHEDULED: data.availableTeachingWeeks,\n  AVAILABLE_TEACHING_WEEKS: data.availableTeachingWeeks\n};\n\n// Add week placeholders\nweeks.forEach(week => {\n  placeholders[`WEEK_${week.weekNumber}_TITLE`] = week.weekTitle;\n  placeholders[`WEEK_${week.weekNumber}_MODULE`] = week.module;\n  placeholders[`WEEK_${week.weekNumber}_MUST_COVER`] = week.mustCover;\n  placeholders[`WEEK_${week.weekNumber}_COULD_COVER`] = week.couldCover;\n  placeholders[`WEEK_${week.weekNumber}_SKIP`] = week.skip;\n});\n\n// ===== FINAL OUTPUT =====\nreturn [{\n  json: {\n    meta: {\n      title: \"AI Pacing Bot Recommendations\",\n      program: \"INCUBATOREDU\",\n      generatedOn: timestamp.toISOString(),\n      previousRecID: data.previousRecID,\n      teacherName: data.teacherName,\n      teacherEmail: data.teacherEmail,\n      avgMinutesPerWeek: data.avgMinutesPerWeek,\n      weeksRemaining: data.totalWeeksRemaining,\n      startingLesson: data.currentLesson,\n      mvpPitchWeek: data.mvpAlreadyOccurred ? \"Already occurred\" : `Week ${data.mvpPitchWeek}`,\n      finalPitchWeek: `Week ${data.finalPitchWeek}`\n    },\n    weeks,\n    summary: {\n      totalLessonsScheduled: totalLessonsInSchedule,\n      totalLessonsToCover: totalLessonsToCover,\n      mustCoverLessons: mustCoverDayCount,\n      couldCoverLessons: couldCoverDayCount,\n      canSkipLessons: skipDayCount,\n      droppedLessonDays: droppedLessonDays,\n      uncoveredLessons: uncoveredLessons,\n      uncoveredUnits: uncoveredUnits,\n      totalWeeksScheduled: data.availableTeachingWeeks,\n      availableTeachingWeeks: data.availableTeachingWeeks,\n      reservedMilestoneWeeks: data.reservedWeeks?.length || 0,\n      mvpPitchWeek: data.mvpAlreadyOccurred ? \"Already occurred\" : `Week ${data.mvpPitchWeek}`,\n      finalPitchWeek: `Week ${data.finalPitchWeek}`\n    },\n    placeholders,\n    success: true\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1600,
+        1040
+      ],
+      "id": "2730cc10-716c-489d-ae66-6445a08352c5",
+      "name": "INCubatoredu - Format Output"
+    },
+    {
+      "parameters": {
+        "tableId": "Teacher Informantion",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "program_selection",
+              "fieldValue": "entreINCedu"
+            },
+            {
+              "fieldId": "teacher_name",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.teacherName }}"
+            },
+            {
+              "fieldId": "teacher_email",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.teacherEmail }}"
+            },
+            {
+              "fieldId": "avg_minutes_per_week_in_class",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.avgMinutesPerWeek }}"
+            },
+            {
+              "fieldId": "weeks_remaining",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.weeksRemaining }}"
+            },
+            {
+              "fieldId": "current_curriculum_position",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.startingLesson }}"
+            },
+            {
+              "fieldId": "certifications_selected",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.certifications }}"
+            },
+            {
+              "fieldId": "modules_to_skip",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.skippedModules }}"
+            },
+            {
+              "fieldId": "submission_date",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.generatedOn }}"
+            },
+            {
+              "fieldId": "is_latest",
+              "fieldValue": "=true"
+            },
+            {
+              "fieldId": "modules_completed",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.completedModules }}"
+            },
+            {
+              "fieldId": "include_course_connections",
+              "fieldValue": "={{ $('Format Data for template').item.json.meta.includeCourseConnections }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -992,
+        208
+      ],
+      "id": "6260f1f8-5409-4040-9d4a-06e30b88fc5e",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "Teacher Informantion",
+        "returnAll": true,
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "teacher_email",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions0_Field_Value', `Match exact email from DB`, 'string') }}"
+            },
+            {
+              "keyName": "is_latest",
+              "condition": "eq",
+              "keyValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('conditions1_Field_Value', ``, 'string') }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabaseTool",
+      "typeVersion": 1,
+      "position": [
+        -3200,
+        240
+      ],
+      "id": "c864db93-d6d2-4c66-8fe7-384e52be640f",
+      "name": "Check Teacher Database",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Get required nodes safely ---\nconst validateNode = $('EntreINC - Validate Inputs1')?.first()?.json;\nif (!validateNode) throw new Error(\"Validate Inputs node not found\");\n\nconst calcNode = $('EntreINC - Calculate Available Minutes1')?.first()?.json;\nif (!calcNode) throw new Error(\"Calculate Available Minutes node not found\");\n\n// --- Input rows ---\nconst supabaseRows = $input.all().map(i => i.json);\n\n// --- Constants ---\nconst avgMinutesPerSession = 45;\nconst esbModuleNumber = 9;\nconst esbModuleName = \"Entrepreneurship and Small Business Exam Prep\";\nconst esbCertification = \"Entrepreneurship and Small Business (ESBv2)\";\n\n// --- Certifications ---\nconst selectedCertifications = validateNode.certifications ?? [];\nconst hasESBCert = selectedCertifications.includes(esbCertification);\n\n// --- Skipped modules (clone only once) ---\nconst skippedModules = Array.isArray(calcNode.skippedModules)\n  ? [...calcNode.skippedModules]\n  : [];\n\n// --- Maps ---\nconst lessonsMap = Object.create(null);\nconst modulesMap = Object.create(null);\n\n// --- Build lessons & modules ---\nfor (const row of supabaseRows) {\n  const moduleNumber = Number(row.Module_Number);\n  const lessonNumber = Number(row.Lesson_Number);\n  const dayNumber = Number(row.Day_Number);\n\n  if (!modulesMap[moduleNumber]) {\n    let isSkipped = skippedModules.includes(row.Module_Name);\n\n    // ESB rule\n    if (moduleNumber === esbModuleNumber && !hasESBCert) {\n      isSkipped = true;\n      if (!skippedModules.includes(esbModuleName)) {\n        skippedModules.push(esbModuleName);\n      }\n    }\n\n    modulesMap[moduleNumber] = {\n      moduleNumber,\n      moduleName: row.Module_Name,\n      certification: row.Certification_Association ?? null,\n      lessons: [],\n      skipped: isSkipped\n    };\n  }\n\n  if (modulesMap[moduleNumber].skipped) continue;\n\n  const lessonKey = `${moduleNumber}.${lessonNumber}`;\n\n  if (!lessonsMap[lessonKey]) {\n    lessonsMap[lessonKey] = {\n      lessonId: lessonKey,\n      moduleNumber,\n      moduleName: row.Module_Name,\n      lessonNumber,\n      lessonTitle: (row.Lesson_Title || \"\").replace(\": CIP\", \"\").trim(),\n      certification: row.Certification_Association ?? null,\n      days: [],\n      skipped: false\n    };\n  }\n\n  // Read numerical Priority_Ranking (1-5, where 5 = highest)\n  const priorityRanking = Number(row.Priority_Ranking) || 1;\n\n  lessonsMap[lessonKey].days.push({\n    day: dayNumber,\n    priorityRanking: priorityRanking,\n    dayTitle: row.Day_Title,\n    notes: row.Notes,\n    estimatedMinutes:\n      Number.parseInt(row[\"Estimated Length\"], 10) || avgMinutesPerSession\n  });\n}\n\n// --- Attach lessons to modules ---\nfor (const lesson of Object.values(lessonsMap)) {\n  const mod = modulesMap[lesson.moduleNumber];\n  if (mod && !mod.skipped) {\n    mod.lessons.push(lesson);\n  }\n}\n\n// --- Ensure ESB module exists ---\nif (!modulesMap[esbModuleNumber]) {\n  modulesMap[esbModuleNumber] = {\n    moduleNumber: esbModuleNumber,\n    moduleName: esbModuleName,\n    certification: esbCertification,\n    lessons: [],\n    skipped: !hasESBCert\n  };\n\n  if (!hasESBCert && !skippedModules.includes(esbModuleName)) {\n    skippedModules.push(esbModuleName);\n  }\n}\n\n// --- Output ---\nreturn [\n  {\n    json: {\n      ...validateNode,\n      totalMinutes: calcNode.totalMinutes,\n      avgMinutesPerSession,\n      totalSessions: calcNode.totalSessions,\n      sessionsPerWeek: calcNode.sessionsPerWeek,\n      calculationComplete: true,\n      allModules: Object.values(modulesMap)\n        .filter(m => !m.skipped)\n        .sort((a, b) => a.moduleNumber - b.moduleNumber),\n      allLessons: Object.values(lessonsMap)\n        .filter(l => !modulesMap[l.moduleNumber]?.skipped)\n        .sort((a, b) =>\n          a.moduleNumber !== b.moduleNumber\n            ? a.moduleNumber - b.moduleNumber\n            : a.lessonNumber - b.lessonNumber\n        ),\n      skippedModules,\n      selectedCertifications\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1424,
+        -16
+      ],
+      "id": "8f8c2f58-914d-4de2-b961-571b9aab39b0",
+      "name": "Collect data from DB"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "Teacher Informantion",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "teacher_email",
+              "condition": "eq",
+              "keyValue": "={{ $('Format Data for template').item.json.meta.teacherEmail }}"
+            },
+            {
+              "keyName": "program_selection",
+              "condition": "eq",
+              "keyValue": "EntreINC"
+            },
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Format Data for template').item.json.meta.previousRecID }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_latest",
+              "fieldValue": "=FALSE"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1216,
+        224
+      ],
+      "id": "4c76638c-24dd-4dac-bd5a-f9ca8cdcf632",
+      "name": "Update a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "tableId": "Teacher Informantion",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "program_selection",
+              "fieldValue": "InCubatoredu"
+            },
+            {
+              "fieldId": "teacher_name",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.teacherName }}"
+            },
+            {
+              "fieldId": "teacher_email",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.teacherEmail }}"
+            },
+            {
+              "fieldId": "avg_minutes_per_week_in_class",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.avgMinutesPerWeek }}"
+            },
+            {
+              "fieldId": "weeks_remaining",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.weeksRemaining }}"
+            },
+            {
+              "fieldId": "current_curriculum_position",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.startingLesson }}"
+            },
+            {
+              "fieldId": "submission_date",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.generatedOn }}"
+            },
+            {
+              "fieldId": "is_latest",
+              "fieldValue": "=true"
+            },
+            {
+              "fieldId": "mvp_pitch_week",
+              "fieldValue": "={{ $('Prepare Data for Google Doc').item.json.meta.mvpPitchWeek }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        1040
+      ],
+      "id": "463aa4e2-2222-4978-8d8d-08f7cb29731a",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "Teacher Informantion",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "teacher_email",
+              "condition": "eq",
+              "keyValue": "={{ $('Prepare Data for Google Doc').item.json.meta.teacherEmail }}"
+            },
+            {
+              "keyName": "program_selection",
+              "condition": "eq",
+              "keyValue": "InCubatoredu"
+            },
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Prepare Data for Google Doc').item.json.meta.previousRecID }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "is_latest",
+              "fieldValue": "=FALSE"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -992,
+        1040
+      ],
+      "id": "d6e0f727-3985-451e-a363-63b10ab87a33",
+      "name": "Update a row1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "LbrJVQmtV0Can9fr",
+          "name": "UL Scheduler"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hello! 👋\nI'm here to help you set up your Uncharted Learning program schedule. Let's get started!\nWhat is your email address?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -3584,
+        16
+      ],
+      "id": "7e72caf3-7526-4ccb-9caf-1646a8ef052d",
+      "name": "When chat message received",
+      "webhookId": "78a8d7c7-19e1-4e28-97b8-66774ef3b505"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\n\n// ============================================================\n// With the new INCubatoredu scheduling logic, every available\n// teaching week is guaranteed to be filled:\n//   - n must-covers (sequential)\n//   - 1 could-cover (nearest)\n//   - skips attached to their lesson group's week\n//\n// No redistribution is needed. This node passes data through.\n// ============================================================\n\nconst weeklySchedule    = data.weeklySchedule || [];\nconst reservedWeeks     = data.reservedWeeks   || [];\nconst totalWeeks        = data.totalWeeksRemaining || 0;\nconst availableWeeks    = totalWeeks - reservedWeeks.length;\nconst scheduledWeeks    = weeklySchedule.length;\n\nconsole.log('========================================');\nconsole.log('Handle Empty Weeks — Passthrough');\nconsole.log(`Total weeks remaining  : ${totalWeeks}`);\nconsole.log(`Reserved milestone wks : ${reservedWeeks.length}`);\nconsole.log(`Available teaching wks : ${availableWeeks}`);\nconsole.log(`Scheduled weeks        : ${scheduledWeeks}`);\nconsole.log(`Unfilled weeks         : ${availableWeeks - scheduledWeeks}`);\nconsole.log('========================================');\n\n// Safety check: warn if unexpected gaps exist\nif (scheduledWeeks < availableWeeks) {\n  console.warn(`⚠️ ${availableWeeks - scheduledWeeks} teaching weeks are unfilled.`);\n  console.warn('This may indicate there were fewer lessons than the budget allowed.');\n}\n\nreturn [{ json: data }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1824,
+        1040
+      ],
+      "id": "c549169e-a9bc-4d55-b0e4-61fb85091021",
+      "name": "Handle empty weeks"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are an AI assistant for collecting teacher data for Uncharted Learning programs. Your goal is to collect all required inputs, one step at a time, and store them in a JSON object.\n\n**CRITICAL OUTPUT RULE:**\nNEVER show your internal reasoning, verification steps, database query results, record IDs, step references (e.g., \"Following STEP 2B\"), or decision-making process to the user. Your response must ONLY contain the friendly, teacher-facing message. All logic, verification, counting, and decision-making must happen silently. The user should never see database IDs, match verification steps, program counting, or references to workflow steps.\n\n---\n\n## SECTION 1: RETURNING USER DETECTION\n\nAfter the teacher provides their email address (Question 1), you MUST:\n\n1. Normalize the email:\n   - Trim whitespace\n   - Convert to lowercase\n   - Store as normalizedEmail\n\n2. Use the Supabase tool to check if this teacher has used the system before.\n\n3. Query the \"Teacher Informantion\" table with STRICT filters:\n   - teacher_email = normalizedEmail\n   - is_latest = true\n\n   CRITICAL QUERY RULES:\n   - Use exact equality only.\n   - Do NOT use LIKE, ILIKE, contains, fuzzy matching, or similarity search.\n   - Do NOT attempt to infer similar emails.\n   - Do NOT suggest alternative email addresses.\n\n4. After retrieving results:\n   - Verify that every returned record has LOWER(teacher_email) = normalizedEmail.\n   - If ANY record does NOT exactly match, immediately discard ALL results and treat as NEW USER.\n   - Never expose or display any other email address under any circumstance.\n\n5. ABSOLUTE NON-DISCLOSURE RULE:\n   If no exact-match records remain after strict equality verification:\n   - Treat the teacher as a NEW USER.\n   - Do NOT mention that any records were returned.\n   - Do NOT mention similar or misspelled emails.\n   - Do NOT compare spellings.\n   - Do NOT explain why a match failed.\n   - Do NOT reference multiple records.\n   - Do NOT describe database results.\n   - Do NOT narrate the verification process.\n   - Do NOT reveal or partially reveal any other email address under any circumstance.\n   - Immediately continue to Question 2 with no explanation.\n\n6. Count how many distinct programs this teacher has records for (using only exact-match records).\n\n7. If no exact-match records are found → NEW USER → continue with Questions 2-3 onwards.\n\n8. If exact-match records are found → RETURNING USER → follow Section 2 below.\n\n---\n\n## SECTION 2: RETURNING USER FLOW\n\n**STEP 1: Determine Program Count**\nAfter finding records with is_latest = true, count distinct programs:\n- If teacher has records for ONLY ONE program → Go to STEP 2A\n- If teacher has records for BOTH programs → Go to STEP 2B\n\n**STEP 2A: Single Program Flow**\n\nGet the latest record (is_latest = true) and calculate time elapsed, then show:\n\n\"👋 **Hey [Teacher Name]! Welcome back!**\n\nI see you used this tool [X] weeks ago on [previous submission date] for **[previous program]**.\n\nHere's your information as it currently stands:\n\n✅ **Program:** [previous program]\n\n✅ **Your Name:** [previous name]\n\n✅ **Email:** [previous email]\n\n📊 **Average Minutes Per Week:** [previous minutes]\n\n🔄 **Weeks Remaining:** [previous weeks] → **[calculated updated weeks]** *(updated based on [X] weeks elapsed)*\n\n[If INCubatoredu only:]\n🔄 **MVP Pitch Week:** Week [previous MVP week] → **Week [calculated updated MVP week]** *(updated)*\n\n*The values marked with 🔄 have been automatically updated based on the time that has passed.*\n\n---\n\n**What would you like to do?**\n\n**1.** ✏️ Use my current minutes/week and weeks remaining, and update the rest\n**2.** 🔁 Start fresh and update everything\n**3.** ➕ Create a schedule for [opposite program]\"\n\n**STEP 2B: Multiple Program Flow**\n\nFirst, ask the teacher to select which program:\n\n\"👋 **Hey [Teacher Name]! Welcome back!**\n\nI see you've used this tool for both **entreINCedu** and **INCubatoredu**.\n\nWhich program would you like to update today?\n\n**1.** entreINCedu\n**2.** INCubatoredu\"\n\n**Wait for teacher's response (1 or 2), then:**\n\nGet the is_latest = true record for the selected program, calculate time elapsed, and show:\n\n\"Great! Here's your current information for **[selected program]**:\n\n✅ **Program:** [selected program]\n\n✅ **Your Name:** [teacher name]\n\n✅ **Email:** [teacher email]\n\n📊 **Average Minutes Per Week:** [previous minutes]\n\n🔄 **Weeks Remaining:** [previous weeks] → **[calculated updated weeks]** *(updated based on [X] weeks elapsed)*\n\n[If INCubatoredu selected:]\n🔄 **MVP Pitch Week:** Week [previous MVP week] → **Week [calculated updated MVP week]** *(updated)*\n\n*The values marked with 🔄 have been automatically updated based on the time that has passed.*\n\n---\n\n**What would you like to do?**\n\n**1.** ✏️ Use my current minutes/week and weeks remaining, and update the rest\n**2.** 🔁 Start fresh and update everything\"\n\n---\n\n**CRITICAL FORMATTING RULE FOR RETURNING USER DISPLAY:**\nEach data field (✅, 📊, 🔄) MUST be on its own line with a blank line between each. Do NOT combine them onto a single line. The horizontal rule (---) before the options is required. Each option MUST be on its own line.\n\n---\n\n**WHAT EACH OPTION DOES:**\n\n**Option 1 — \"Use current minutes/weeks, update the rest\":**\n- KEEP from previous record: teacherName, teacherEmail, program, avgMinutesPerWeek, weeksRemaining (auto-updated), mvpPitchWeek (auto-updated, INCubatoredu only)\n- SKIP: Questions 2, 3, 4, 5\n- ALWAYS RE-ASK (for entreINCedu): Q6e → Q7b → Q7c → Q8\n- ALWAYS RE-ASK (for INCubatoredu): Q6i only\n- **For INCubatoredu Option 1: Do NOT re-ask Q7a (MVP Pitch Week). Use the auto-updated value.**\n- **CRITICAL: Do NOT carry over previous certifications, completedModules, skippedModules, or includeCourseConnections. Start these fields fresh from the teacher's new answers.**\n\n**Option 2 — \"Start fresh and update everything\":**\n- KEEP from previous record: teacherName, teacherEmail, program\n- SKIP: Questions 2, 3\n- RE-ASK: Q4 → Q5 → Q6e/6i → Q7a/7b → Q7c → Q8\n- **CRITICAL: Do NOT carry over previous certifications, completedModules, skippedModules, or includeCourseConnections. Start these fields fresh from the teacher's new answers.**\n\n**Option 3 — \"Create opposite program\" (Single Program Flow ONLY):**\n- Set program to the opposite program\n- Set isReturningUser = false (this is a NEW program for them)\n- Ask Question 4 onwards for the NEW program as if they were a new user\n- Do NOT include previousData in final JSON\n\n---\n\n**CALCULATIONS FOR RETURNING USERS:**\n- Current Date: Use ={{ $now.toISO() }}\n- Weeks Elapsed = FLOOR(number of days between Current Date and Previous Submission Date / 7) — always round DOWN to whole weeks. For example: 1 day = 0 weeks, 6 days = 0 weeks, 7 days = 1 week, 13 days = 1 week, 14 days = 2 weeks. If 0 weeks have elapsed, do NOT subtract anything from weeks remaining or MVP pitch week.\n- Updated Weeks Remaining = Previous Weeks Remaining - Weeks Elapsed (minimum 0) — must be a whole number\n- Updated MVP Pitch Week = Previous MVP Pitch Week - Weeks Elapsed (minimum 0, for INCubatoredu only) — must be a whole number\n- IMPORTANT: Never show decimal values for weeks. All week calculations must use whole numbers only.\n\n---\n\n## SECTION 3: JSON STRUCTURES\n\nThe teacher's answers should be stored in a JSON structure **silently**. Do NOT show it to the user until the end.\n\n**For INCubatoredu (NEW USER):**\n```json\n{\n  \"timestamp\": \"{{ $now.toISO() }}\",\n  \"program\": \"INCubatoredu\",\n  \"teacherName\": \"\",\n  \"teacherEmail\": \"\",\n  \"avgMinutesPerWeek\": null,\n  \"weeksRemaining\": null,\n  \"currentLesson\": \"\",\n  \"mvpPitchWeek\": null,\n  \"isComplete\": false,\n  \"isReturningUser\": false\n}\n```\n\n**For entreINCedu (NEW USER):**\n```json\n{\n  \"timestamp\": \"{{ $now.toISO() }}\",\n  \"program\": \"entreINCedu\",\n  \"teacherName\": \"\",\n  \"teacherEmail\": \"\",\n  \"avgMinutesPerWeek\": null,\n  \"weeksRemaining\": null,\n  \"currentLesson\": \"1.1\",\n  \"completedModules\": [],\n  \"certifications\": [],\n  \"includeCourseConnections\": false,\n  \"skippedModules\": [],\n  \"isComplete\": false,\n  \"isReturningUser\": false\n}\n```\n\n**CRITICAL: The entreINCedu JSON MUST always include `completedModules` as a separate array field containing module NAMES. This field must appear in the final JSON even if empty.**\n\n**For INCubatoredu (RETURNING USER):**\n```json\n{\n  \"timestamp\": \"<current ISO timestamp>\",\n  \"program\": \"INCubatoredu\",\n  \"teacherName\": \"\",\n  \"teacherEmail\": \"\",\n  \"avgMinutesPerWeek\": null,\n  \"weeksRemaining\": null,\n  \"currentLesson\": \"\",\n  \"mvpPitchWeek\": null,\n  \"isComplete\": true,\n  \"isReturningUser\": true,\n  \"previousData\": {\n    \"recordId\": \"<latestRecordId>\",\n    \"submissionDate\": \"<from database>\",\n    \"avgMinutesPerWeek\": \"<from database>\",\n    \"weeksRemaining\": \"<from database>\",\n    \"currentLesson\": \"<from database>\",\n    \"mvpPitchWeek\": \"<from database>\",\n    \"certifications\": [],\n    \"skippedModules\": []\n  },\n  \"weeksElapsed\": \"<calculated value>\",\n  \"updatedWeeksRemaining\": \"<calculated value>\",\n  \"updatedMvpPitchWeek\": \"<calculated value>\"\n}\n```\n\n**For entreINCedu (RETURNING USER):**\n```json\n{\n  \"timestamp\": \"<current ISO timestamp>\",\n  \"program\": \"entreINCedu\",\n  \"teacherName\": \"\",\n  \"teacherEmail\": \"\",\n  \"avgMinutesPerWeek\": null,\n  \"weeksRemaining\": null,\n  \"currentLesson\": \"1.1\",\n  \"completedModules\": [],\n  \"certifications\": [],\n  \"includeCourseConnections\": false,\n  \"skippedModules\": [],\n  \"isComplete\": true,\n  \"isReturningUser\": true,\n  \"previousData\": {\n    \"recordId\": \"<latestRecordId>\",\n    \"submissionDate\": \"<from database>\",\n    \"avgMinutesPerWeek\": \"<from database>\",\n    \"weeksRemaining\": \"<from database>\",\n    \"currentLesson\": \"1.1\",\n    \"mvpPitchWeek\": null,\n    \"completedModules\": \"<from database>\",\n    \"certifications\": \"<from database>\",\n    \"includeCourseConnections\": \"<from database>\",\n    \"skippedModules\": \"<from database>\"\n  },\n  \"weeksElapsed\": \"<calculated value>\",\n  \"updatedWeeksRemaining\": \"<calculated value>\",\n  \"updatedMvpPitchWeek\": null\n}\n```\n\n---\n\n## SECTION 4: VALIDATION RULES\n\nOnly show **one question at a time** to the teacher. Validate each answer:\n\n* `program` → must be either \"entreINCedu\" or \"INCubatoredu\"\n* `teacherName` → non-empty text\n* `teacherEmail` → must contain \"@\" and \".\"\n* `avgMinutesPerWeek` → number between 30 and 500\n* `weeksRemaining` → number between 1 and 52\n* `currentLesson` → (INCubatoredu only) format \"X.Y\" where X=1-8, Y varies by unit\n* `completedModules` → (entreINCedu only) array of module numbers 1-9; 0 means none\n* `mvpPitchWeek` → (INCubatoredu only) number between 0 and weeksRemaining - 3, or 0 if already occurred. MVP pitch must happen at least 3 weeks before the end of the schedule to leave room for final pitch preparation and final pitch. If the teacher enters a value greater than weeksRemaining - 3, respond with the validation message in Q7a.\n* `includeCourseConnections` → (entreINCedu only) boolean, true or false\n* `certifications` → (entreINCedu only) can be empty or one/both/all three of:\n  * \"Intuit Design for Delight Innovator Certification\"\n  * \"PMI Project Management Ready® Certification\"\n  * \"Entrepreneurship and Small Business (ESBv2)\"\n* `skippedModules` → (entreINCedu only) numbers from the remaining modules list; convert to module names in final JSON; 0 means none\n\n---\n\n## SECTION 5: QUESTION FLOW\n\n**Question 1 (All Programs - MUST BE FIRST):**\n\"👋 Hello! I'm here to help you set up your **Uncharted Learning** program schedule. Let's get started!\n\nWhat is your **email address**?\"\n\n**[IMMEDIATELY AFTER QUESTION 1: Check Supabase for returning user]**\n- If returning user with BOTH programs: Ask program selection question BEFORE showing any data\n- If returning user with ONE program: Skip Questions 2-3 and show their data\n- If new user: Continue with Questions 2-3\n\n**Question 2 (All Programs - Skip for returning users):**\n\"What is your **full name**?\"\n\n**Question 3 (All Programs - Skip for returning users):**\n\"Which program are you teaching?\n\n**1.** entreINCedu\n**2.** INCubatoredu\"\n\n**Question 4 (All Programs - Skip if returning user chooses option 1):**\n\"On average, about how many **total minutes per week** do you teach this class?\"\n\n**Question 5 (Program-Specific Phrasing - Skip if returning user chooses option 1):**\n- If **INCubatoredu**: \"How many **full instructional weeks** do you have left until your final pitch? *(Exclude weeks with significant holiday breaks or fewer than 3 scheduled school days, unless that is your standard block schedule.)*\"\n- If **entreINCedu**: \"How many **full instructional weeks** do you have left? *(Exclude weeks with significant holiday breaks or fewer than 3 scheduled school days, unless that is your standard block schedule.)*\"\n\n---\n\n**Question 6 is PROGRAM-SPECIFIC:**\n**This question MUST ALWAYS BE ASKED, even for returning users choosing option 1.**\n\n**Question 6i (INCubatoredu ONLY):**\n\"Enter your **current Lesson Number** *(e.g., 1.5 or 2.3)*. If you haven't started the curriculum yet, please enter **1.1**.\"\n\n**VALIDATION FOR 6i:**\n- X must be 1-8, Y must be within the valid range for that unit:\n  * Unit 1: Y = 1-7\n  * Unit 2: Y = 1-5\n  * Unit 3: Y = 1-4\n  * Unit 4: Y = 1-5\n  * Unit 5: Y = 1-5\n  * Unit 6: Y = 1-4\n  * Unit 7: Y = 1-4\n  * Unit 8: Y = 1-3\n- Example error: \"Unit 2 has lessons 2.1 through 2.5. Please enter a valid lesson number.\"\n\n**Question 6e (entreINCedu ONLY):**\n\"Which modules have you **already completed**? Please enter the numbers separated by commas, or enter **0** if you haven't completed any yet.\n\n**Modules:**\n\n1. Entrepreneurship and Business Foundations\n\n2. Customer-Centric Design Thinking\n\n3. Project Management\n\n4. Financial Management\n\n5. Marketing and Sales\n\n6. Leadership and Durable Skill Development\n\n7. Creative Problem Solving and Innovative Thinking\n\n8. Building a Personal Brand\n\n9. Entrepreneurship and Small Business Exam Prep\"\n\n**FORMATTING RULE FOR 6e:** Each module MUST be separated by a BLANK LINE (double newline). There must be an empty line between every module. A single newline will be collapsed by the chat — you MUST use double newlines. Do NOT combine modules onto a single line.\n\n**VALIDATION FOR 6e:**\n- Accept numbers 1-9 separated by commas, or 0 for none\n- Store the selected numbers as `completedModules` array\n- Example valid inputs: \"0\", \"1, 3\", \"1, 2, 3, 4\", \"2, 5, 7\"\n- If invalid input: \"Please enter module numbers between 1 and 9 separated by commas, or 0 if none.\"\n\n**AFTER QUESTION 6e:**\n- Store completed module numbers in `completedModules`\n- Set `currentLesson` to `\"1.1\"` always for entreINCedu\n- Completed modules will be merged into `skippedModules` in the final JSON\n\n---\n\n**Question 7a (INCubatoredu ONLY - Skip if returning user chooses option 1):**\n\"What week is your **MVP pitch**? This must be at least **3 weeks before** your last instructional week. *(If your MVP pitch has already happened, enter 0)*\"\n\n**VALIDATION FOR 7a:**\n- Must be 0 (already occurred) or between 1 and weeksRemaining - 3\n- If teacher enters a value greater than weeksRemaining - 3: \"⚠️ The MVP pitch needs to happen at least **3 weeks before your last week** to leave room for final pitch prep and the final pitch. With **[weeksRemaining] weeks** remaining, please enter a week number of **[weeksRemaining - 3] or earlier**, or **0** if it has already occurred.\"\n\n**Question 7b (entreINCedu ONLY - ALWAYS ASK, even for returning users choosing option 1):**\n\"Are your students completing any **certifications**? Please enter the numbers separated by commas, or enter **0** for none:\n\n**1.** Intuit Design for Delight Innovator Certification\n**2.** PMI Project Management Ready® Certification\n**3.** Entrepreneurship and Small Business (ESBv2)\"\n\n**AFTER RECEIVING CERTIFICATION ANSWER — RESTORE CERT-REQUIRED MODULES:**\n\nIf the teacher selected 0 (no certifications), skip conflict checks entirely and proceed to Q7c.\n\nIf certifications WERE selected, check ONLY the selected certifications:\n- Intuit Design for Delight requires Module 2\n- PMI Project Management Ready requires Module 3\n- ESBv2 requires Module 9\n\n**For EACH certification selected:** Check if its required module is in completedModules.\n- **IF YES:** REMOVE that module number from the completedModules list immediately. This ensures it will appear in the Question 8 module list.\n- **IF NO:** No action needed.\n\n**Example:** Teacher completes modules 3, 7, 9 and selects PMI (requires Module 3) and ESBv2 (requires Module 9).\n→ Remove 3 and 9 from completedModules → completedModules becomes [7]\n→ Question 8 will show modules: 1, 2, 3, 4, 5, 6, 8, 9 (everything except 7)\n\nThis step is MANDATORY. Do NOT skip it. Do NOT leave cert-required modules in completedModules.\n\n**Module 9 (ESBv2) special handling:**\n- If teacher marks Module 9 as completed AND selects ESBv2 cert → remove Module 9 from completedModules (cert takes priority)\n- If teacher marks Module 9 as completed and does NOT select ESBv2 → keep in completedModules (will be skipped)\n- If Module 9 NOT completed and ESBv2 NOT selected → Module 9 auto-added to skippedModules\n- If Module 9 NOT completed and ESBv2 IS selected → Module 9 naturally included in schedule\n\n---\n\n**Question 7c (entreINCedu ONLY - ALWAYS ASK, even for returning users choosing option 1):**\n\"Are you integrating **Course Connections**, including the Community Impact Project?\n\n**1.** Yes\n**2.** No\"\n\n**VALIDATION FOR 7c:**\n- Accept 1 (Yes) or 2 (No)\n- Store as `includeCourseConnections`: true if 1, false if 2\n\n**WHAT THIS AFFECTS (silently, downstream):**\n- Yes (true): Day 5 lessons keep database priority rankings\n- No (false): Day 5 lessons get deprioritized by scheduling system\n\n---\n\n**Question 8 (entreINCedu ONLY - ALWAYS ASK, even for returning users choosing option 1):**\n\n**DYNAMIC MODULE LIST:** Show ONLY modules that are:\n- NOT in the completedModules list (after cert restoration above)\n- NOT Module 9 (unless ESBv2 certification was selected)\n\n**IMPORTANT:** Double-check the completedModules list before building this list. If the teacher said they completed Module 8, Module 8 must NOT appear here (unless a certification requires it — currently no certification requires Module 8). Only cert-required modules get restored from completedModules.\n\n**MANDATORY PRE-DISPLAY CHECKLIST (perform silently before showing Q8):**\nBefore displaying the module list, you MUST verify ALL of the following:\n\nSTEP A — Start with the full list: modules 1, 2, 3, 4, 5, 6, 7, 8, 9\nSTEP B — Remove completed modules (from Q6e answer)\nSTEP C — Remove Module 9 ONLY IF ESBv2 was NOT selected\nSTEP D — For each selected certification, confirm its required module IS in the list:\n  - Intuit selected? Module 2 MUST be in the list.\n  - PMI selected? Module 3 MUST be in the list.\n  - ESBv2 selected? Module 9 MUST be in the list.\n  If any is missing, add it back.\nSTEP E — Verify every module uses its ORIGINAL number (1-9). \n  Module 2 is ALWAYS \"2. Customer-Centric Design Thinking\"\n  Module 3 is ALWAYS \"3. Project Management\"\n  Module 9 is ALWAYS \"9. Entrepreneurship and Small Business Exam Prep\"\n  NEVER renumber modules sequentially. If modules 1,2,4,5,9 remain, they display as 1, 2, 4, 5, 9 — NOT 1, 2, 3, 4, 5.\n\nIf you skip this checklist, the schedule will break.\n\n\"Here are the modules that will be in your schedule. Would you like to **remove** any? Please enter the numbers separated by commas, or enter **0** to keep all:\n\n**Modules:**\n[list only applicable modules, each on its own line]\"\n\n**FORMATTING RULE FOR QUESTION 8:** Each module MUST be separated by a BLANK LINE (double newline). Use this exact format:\n\n**Modules:**\n\n2. Customer-Centric Design Thinking\n\n3. Project Management\n\n4. Financial Management\n\nThere must be an empty line between EVERY module. A single newline will be collapsed by the chat — you MUST use double newlines (blank line) between each module. Do NOT combine modules onto a single line.\n\n**Example scenarios:**\n\n[If no modules completed, no ESBv2 cert:]\n\"Here are the modules that will be in your schedule. Would you like to **remove** any? Please enter the numbers separated by commas, or enter **0** to keep all:\n\n**Modules:**\n1. Entrepreneurship and Business Foundations\n2. Customer-Centric Design Thinking\n3. Project Management\n4. Financial Management\n5. Marketing and Sales\n6. Leadership and Durable Skill Development\n7. Creative Problem Solving and Innovative Thinking\n8. Building a Personal Brand\"\n\n[If modules 1 and 3 completed, PMI cert selected (Module 3 restored):]\n\"Here are the modules that will be in your schedule. Would you like to **remove** any? Please enter the numbers separated by commas, or enter **0** to keep all:\n\n**Modules:**\n2. Customer-Centric Design Thinking\n3. Project Management\n4. Financial Management\n5. Marketing and Sales\n6. Leadership and Durable Skill Development\n7. Creative Problem Solving and Innovative Thinking\n8. Building a Personal Brand\"\n\n[If modules 1, 2, 3 completed, no certs:]\n\"Here are the modules that will be in your schedule. Would you like to **remove** any? Please enter the numbers separated by commas, or enter **0** to keep all:\n\n**Modules:**\n4. Financial Management\n5. Marketing and Sales\n6. Leadership and Durable Skill Development\n7. Creative Problem Solving and Innovative Thinking\n8. Building a Personal Brand\"\n\n[If all 8 modules completed, no certs:]\n\"It looks like you've completed all modules! There are no remaining modules to schedule. Would you like to adjust your completed modules, or would you like to proceed?\"\n\n**NUMBERING RULE:** ALWAYS use the original module numbers (1-9). NEVER renumber modules sequentially. If modules 1, 3, 4, 5 are shown, they must be numbered 1, 3, 4, 5 — NOT renumbered as 1, 2, 3, 4. The numbers correspond to specific modules and must remain consistent throughout the conversation.\n\n**CERT MODULE INCLUSION RULE:** Before displaying the Q8 list, verify that EVERY module required by a selected certification appears in the list. If Intuit was selected, Module 2 MUST be in the list. If PMI was selected, Module 3 MUST be in the list. If ESBv2 was selected, Module 9 MUST be in the list. If any cert-required module is missing from your list, you have a bug — add it back before showing the list.\n\n**VALIDATION FOR QUESTION 8:**\n- Teacher can ONLY select from the modules shown in the list\n- If teacher enters a module not in the list: \"⚠️ Module [X] is not available for selection. Please choose only from the modules shown.\"\n- If teacher tries to skip a certification-required module, handle per Section 6 below\n\n---\n\n## SECTION 6: CERTIFICATION MODULE CONFLICT HANDLING (entreINCedu ONLY)\n\n**Required modules by certification:**\n- **Intuit Design for Delight Innovator Certification** requires Module 2 (Customer-Centric Design Thinking)\n- **PMI Project Management Ready® Certification** requires Module 3 (Project Management)\n- **Entrepreneurship and Small Business (ESBv2)** requires Module 9 (Entrepreneurship and Small Business Exam Prep)\n\n**Conflict handling (Question 8 only):**\n- **If NO conflict:** Proceed silently. No message.\n- **If teacher manually tries to skip a cert-required module in Question 8:**\n\n  \"⚠️ You are trying to remove **Module [X] ([Module Name])** which is required for **[Certification Name]**. What would you like to do?\n\n  **1.** Remove Module [X] and forgo the certification\n  **2.** Select different module(s) to remove\n  **3.** Keep all modules and proceed\"\n\n- Wait for teacher's choice and update accordingly.\n- **IMPORTANT: Only check against certifications selected in THIS session (Question 7b). NEVER use previous certifications from the database.**\n\n---\n\n## SECTION 7: ESBv2 / MODULE 9 AUTO-SKIP RULE (entreINCedu ONLY)\n\n**Default behavior:**\n- If ESBv2 certification is NOT selected → Module 9 is automatically added to skippedModules\n- Module 9 is ONLY shown in Question 8 if ESBv2 certification was selected in this session\n\n**When Module 9 is auto-skipped (ESBv2 not selected), add this note after Question 8:**\n\"📌 *The ESBv2 certification has not been selected, so Module 9 (Entrepreneurship and Small Business Exam Prep) will be automatically skipped.*\"\n\n**If teacher selected ESBv2 and manually skips Module 9 in Q8:**\n- This triggers the conflict handler in Section 6\n\n---\n\n## SECTION 8: FINAL JSON OUTPUT\n\nOnce all questions are answered:\n\n**For entreINCedu:**\n- Set `currentLesson` to `\"1.1\"` (always)\n- Set `includeCourseConnections` to true or false based on Q7c\n- Set `completedModules` to array of completed module NAMES (convert numbers to names)\n- **`completedModules` MUST appear as its own field in the final JSON. Do NOT omit it.**\n- Build `skippedModules` = completedModules (as names) + manually skipped from Q8 (as names)\n- **REMOVE from skippedModules** any module required by a selected certification\n- **ADD Module 9 name to skippedModules** if ESBv2 was NOT selected\n- Convert all module references to **module names** in the final arrays\n\n**For INCubatoredu:**\n- Use currentLesson as entered by teacher\n\n**For all programs:**\n- Fill `\"timestamp\"` with current ISO timestamp\n- Set `\"isComplete\": true`\n- Set `\"isReturningUser\"` appropriately\n- If returning user: Include `\"previousData\"`, `\"weeksElapsed\"`, `\"updatedWeeksRemaining\"`, and `\"updatedMvpPitchWeek\"` (if applicable)\n- **Output ONLY the JSON object** — no extra text, no Markdown, no explanations\n\n---\n\n## SECTION 9: STEP-BY-STEP PROCESSING RULES\n\nAt each step:\n* Update the JSON object silently with the user's valid answer\n* **For entreINCedu**: After Q6e, store completedModules and set currentLesson to \"1.1\"\n* **For entreINCedu**: After Q7b, check cert/completed conflicts and adjust completedModules\n* For **entreINCedu skippedModules**, convert numbers into module names when calculating the final JSON\n* Only show the next question to the teacher\n* If input is invalid, explain politely and re-ask the same question\n* Always maintain a friendly, helpful tone\n\n---\n\n## SECTION 10: CRITICAL REMINDERS\n\n**Email & Returning User:**\n- EMAIL MUST BE FIRST QUESTION\n- ALWAYS query Supabase after Question 1 to check for returning users\n- For returning users with BOTH programs: FIRST ask which program (1 or 2), THEN show data and options\n- For returning users with ONE program: Skip Questions 2-3, show data with options 1/2/3\n\n**Returning User Options:**\n- Option 1: Keep minutes/weeks (and MVP pitch week for INCubatoredu), re-ask Q6 through Q8 for entreINCedu, re-ask Q6i only for INCubatoredu. DO NOT carry over old certs/completed/skipped/courseConnections.\n- Option 2: Re-ask Q4 through Q8. DO NOT carry over old certs/completed/skipped/courseConnections.\n- Option 3: Switch to opposite program as new user\n\n**entreINCedu-Specific:**\n- entreINCedu is NON-LINEAR — teachers complete modules in any order\n- currentLesson is ALWAYS \"1.1\" — scheduling uses skippedModules, not currentLesson\n- completedModules are merged into skippedModules — both are excluded from scheduling UNLESS a cert requires them\n- Module 9 is auto-skipped unless ESBv2 cert is selected\n- ALWAYS remove cert-required modules from completedModules before building Q8 list\n- Only check cert conflicts against THIS session's certifications, never previous ones\n- Q6e, Q7b, Q7c, and Q8 MUST ALL be asked for entreINCedu, even when returning user chooses option 1\n\n**Question Flow for entreINCedu (both option 1 and option 2):**\nQ6e (completed modules) → Q7b (certifications) → Q7c (course connections) → Q8 (remove modules)\nThis sequence is MANDATORY and must NEVER be shortened or skipped.\n\n**JSON Output:**\n- ALWAYS include both previousData and current data for returning users\n- Calculate weeksElapsed, updatedWeeksRemaining, updatedMvpPitchWeek for returning users\n- completedModules MUST be a separate field in the entreINCedu JSON\n\n**Security:**\n- At no point should any email from the database be displayed except the email the teacher entered\n- All database checks must strictly use exact matching\n- If any ambiguity occurs, discard records and treat as NEW USER\n\n**Formatting:**\n- Returning user info display: Each data field MUST be on its own line with a blank line between each\n- Module lists (Q6e and Q8): Each module MUST be on its own line, numbered, no bullet points, no inline formatting\n- Option menus: Each option MUST be on its own line with bold numbering\n- NEVER combine multiple items onto a single line in any list or display\n\n---\n\n## SECTION 11: DATABASE FIELD MAPPING\n\nWhen reading from Supabase \"Teacher Informantion\" table:\n- program_selection → program\n- teacher_name → teacherName\n- teacher_email → teacherEmail\n- avg_minutes_per_week_in_class → avgMinutesPerWeek\n- weeks_remaining → weeksRemaining\n- current_curriculum_position → currentLesson\n- mvp_pitch_week → mvpPitchWeek\n- certifications_selected → certifications (parse if string, convert to array)\n- modules_to_skip → skippedModules (parse if string, convert to array)\n- modules_completed → completedModules (parse if string, convert to array; may not exist for older records — treat as empty array)\n- include_course_connections → includeCourseConnections (boolean; may not exist for older records — treat as false)\n- submission_date → submissionDate\n- is_latest → (used for filtering only)\n\n---\n\n## SECTION 12: MODULE NAMES MAPPING (entreINCedu)\n\n1. Entrepreneurship and Business Foundations\n2. Customer-Centric Design Thinking\n3. Project Management\n4. Financial Management\n5. Marketing and Sales\n6. Leadership and Durable Skill Development\n7. Creative Problem Solving and Innovative Thinking\n8. Building a Personal Brand\n9. Entrepreneurship and Small Business Exam Prep"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -3408,
+        16
+      ],
+      "id": "b516d4a2-0ea6-4fc7-9fa7-5bb8bde88f26",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst certifications = Array.isArray(data.certifications) ? data.certifications : [];\nconst avgMinutesPerSession = 45;\n\n// Certification module number associations\nconst certModuleNumbers = {};\nif (certifications.includes(\"Intuit Design for Delight Innovator Certification\")) {\n  certModuleNumbers[2] = \"Intuit Design for Delight Innovator Certification\";\n}\nif (certifications.includes(\"PMI Project Management Ready® Certification\")) {\n  certModuleNumbers[3] = \"PMI Project Management Ready® Certification\";\n}\nif (certifications.includes(\"Entrepreneurship and Small Business (ESBv2)\")) {\n  certModuleNumbers[9] = \"Entrepreneurship and Small Business (ESBv2)\";\n}\n\nconsole.log(`========================================`);\nconsole.log(`Applying Certification Requirements`);\nconsole.log(`Selected Certifications: ${certifications.join(', ') || 'None'}`);\nconsole.log(`Cert Module Numbers: ${JSON.stringify(certModuleNumbers)}`);\nconsole.log(`========================================`);\n\n// Build selected lessons with certification overrides\ndata.selectedLessons = [];\n\ndata.allLessons.forEach(lesson => {\n  // Check if this lesson's module is a certification module BY MODULE NUMBER\n  // This avoids string matching issues with the certification field\n  const isCertModule = certModuleNumbers.hasOwnProperty(lesson.moduleNumber);\n  \n  // Also check by certification string for backwards compatibility\n  const moduleHasCertByString = lesson.certification && certifications.includes(lesson.certification);\n  \n  const moduleHasCert = isCertModule || moduleHasCertByString;\n\n  if (isCertModule && !moduleHasCertByString) {\n    console.log(`Cert match by MODULE NUMBER (not string) for Module ${lesson.moduleNumber}, Lesson ${lesson.lessonNumber}. DB cert field: \"${lesson.certification}\"`);\n  }\n\n  lesson.days.forEach(day => {\n    let finalPriorityRanking = day.priorityRanking;\n    let isCertificationLocked = false;\n    let isCertificationOptional = false;\n\n    // CRITICAL: Certification modules Days 1-4 are ALWAYS highest priority\n    if (moduleHasCert && day.day >= 1 && day.day <= 4) {\n      finalPriorityRanking = 5; // Max priority\n      isCertificationLocked = true;\n      console.log(`Cert Override: Module ${lesson.moduleNumber}, Lesson ${lesson.lessonNumber}, Day ${day.day} → Priority 5 (LOCKED)`);\n    } else if (moduleHasCert && day.day === 5) {\n      // Day 5 of certification modules is optional\n      isCertificationOptional = true;\n      console.log(`Cert Override: Module ${lesson.moduleNumber}, Lesson ${lesson.lessonNumber}, Day ${day.day} → Could Cover (optional)`);\n    }\n\n    data.selectedLessons.push({\n      lessonId: lesson.lessonId,\n      lessonNumber: lesson.lessonNumber,\n      day: day.day,\n      lessonTitle: lesson.lessonTitle,\n      moduleNumber: lesson.moduleNumber,\n      moduleName: lesson.moduleName,\n      certification: lesson.certification,\n      priorityRanking: finalPriorityRanking,\n      isCertificationLocked: isCertificationLocked,\n      isCertificationOptional: isCertificationOptional,\n      estimatedMinutes: avgMinutesPerSession\n    });\n  });\n});\n\n// === COURSE CONNECTIONS OVERRIDE ===\n// If teacher is NOT integrating Course Connections, demote ALL Day 5 lessons to lowest priority\nconst includeCourseConnections = data.includeCourseConnections || false;\n\nif (!includeCourseConnections) {\n  let day5OverrideCount = 0;\n  data.selectedLessons.forEach(lesson => {\n    if (lesson.day === 5 && !lesson.isCertificationLocked) {\n      lesson.priorityRanking = 0;\n      day5OverrideCount++;\n    }\n  });\n  console.log(`\\nCourse Connections: OFF — Demoted ${day5OverrideCount} Day 5 lessons to priority 1`);\n} else {\n  console.log(`\\nCourse Connections: ON — Day 5 priorities unchanged`);\n}\n\n// Calculate statistics\nconst certLockedCount = data.selectedLessons.filter(l => l.isCertificationLocked).length;\nconst certOptionalCount = data.selectedLessons.filter(l => l.isCertificationOptional).length;\nconsole.log(`\\nTotal selected lessons: ${data.selectedLessons.length}`);\nconsole.log(`Certification locked: ${certLockedCount}`);\nconsole.log(`Certification optional: ${certOptionalCount}`);\nconsole.log(`========================================`);\n\nreturn {\n  json: {\n    ...data,\n    certificationsApplied: certifications.length > 0\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1056,
+        -16
+      ],
+      "id": "88eadfac-84b2-4024-b59d-521c0d2e5106",
+      "name": "EntreINC - Apply Certification Requirements1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Data for template').item.json.meta.teacherEmail }}",
+        "subject": "Your Schedule is Ready!",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;\">\n  <p>Dear {{ $('Format Data for template').item.json.meta.teacherName }},</p>\n\n  <p>Your weekly schedule has been generated! Please find the details below:</p>\n\n  <table style=\"width: 100%; border-collapse: collapse; margin: 16px 0;\">\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold; width: 200px;\">Teacher Name</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.teacherName }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Teacher Email</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.teacherEmail }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Program Type</td>\n      <td style=\"padding: 8px 0;\">entreINCedu</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Generated On</td>\n      <td style=\"padding: 8px 0;\">{{ new Date().toLocaleString('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) }} US Central Time</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Minutes Per Week</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.avgMinutesPerWeek }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Weeks Remaining</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.weeksRemaining }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Certifications</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.certifications }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Course Connections</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.includeCourseConnections ? 'Yes' : 'No' }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Modules Completed</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.completedModules }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Modules Skipped</td>\n      <td style=\"padding: 8px 0;\">{{ $('Format Data for template').item.json.meta.skippedModules }}</td>\n    </tr>\n  </table>\n\n  <p><strong>📄 View your schedule:</strong><br>\n  <a href=\"{{ $('Populate Temple with App Script').item.json.docUrl }}\" style=\"color: #0077cc;\">{{ $('Populate Temple with App Script').item.json.docUrl }}</a></p>\n\n  <p>Please review and follow up as necessary.</p>\n\n  <p>If you have any questions or would like further support, please reply to this email or reach out to <a href=\"mailto:support@unchartedlearning.org\" style=\"color: #0077cc;\">support@unchartedlearning.org</a>.</p>\n\n  <p>\n    Best regards,<br>\n    <strong>entreINCedu Team</strong>\n  </p>\n</div>",
+        "options": {
+          "ccList": "supporttest@simplifytech.ai"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -768,
+        208
+      ],
+      "id": "5845fd4f-23aa-4e20-8280-c0cc100ca201",
+      "name": "Send a message",
+      "webhookId": "3a0cf01b-ae56-40f4-aca4-55f8015e9b20",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Wg7pB2CYpLRCsDq2",
+          "name": "UL Schedule"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Prepare Data for Google Doc').item.json.meta.teacherEmail }}",
+        "subject": "Your Schedule is Ready!",
+        "message": "=<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;\">\n  <p>Dear {{ $('Prepare Data for Google Doc').item.json.meta.teacherName }},</p>\n\n  <p>Your weekly schedule has been generated! Please find the details below:</p>\n\n  <table style=\"width: 100%; border-collapse: collapse; margin: 16px 0;\">\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold; width: 200px;\">Teacher Name</td>\n      <td style=\"padding: 8px 0;\">{{ $('Prepare Data for Google Doc').item.json.meta.teacherName }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Teacher Email</td>\n      <td style=\"padding: 8px 0;\">{{ $('Prepare Data for Google Doc').item.json.meta.teacherEmail }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Program Type</td>\n      <td style=\"padding: 8px 0;\">INCubatoredu</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Generated On</td>\n      <td style=\"padding: 8px 0;\">{{ new Date().toLocaleString('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }) }} US Central Time</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Minutes Per Week</td>\n      <td style=\"padding: 8px 0;\">{{ $('Prepare Data for Google Doc').item.json.meta.avgMinutesPerWeek }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Weeks Remaining</td>\n      <td style=\"padding: 8px 0;\">{{ $('Prepare Data for Google Doc').item.json.meta.weeksRemaining }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Current Lesson</td>\n      <td style=\"padding: 8px 0;\">{{ $('Prepare Data for Google Doc').item.json.meta.startingLesson }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">MVP Pitch Week</td>\n      <td style=\"padding: 8px 0;\">Week {{ $('Prepare Data for Google Doc').item.json.meta.mvpPitchWeek }}</td>\n    </tr>\n    <tr style=\"border-bottom: 1px solid #eee;\">\n      <td style=\"padding: 8px 0; font-weight: bold;\">Final Pitch Week</td>\n      <td style=\"padding: 8px 0;\">Week {{ $('Prepare Data for Google Doc').item.json.meta.finalPitchWeek }}</td>\n    </tr>\n  </table>\n\n  <p><strong>📄 View your schedule:</strong><br>\n  <a href=\"{{ $('Populate Temple with App Script1').item.json.docUrl }}\" style=\"color: #0077cc;\">{{ $('Populate Temple with App Script1').item.json.docUrl }}</a></p>\n\n  <p>Please review and follow up as necessary.</p>\n\n  <p>If you have any questions or would like further support, please reply to this email or reach out to <a href=\"mailto:support@unchartedlearning.org\" style=\"color: #0077cc;\">support@unchartedlearning.org</a>.</p>\n\n  <p>\n    Best regards,<br>\n    <strong>INCubatoredu Team</strong>\n  </p>\n</div>",
+        "options": {
+          "ccList": "supporttest@simplifytech.ai"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        1040
+      ],
+      "id": "3a2b9134-54eb-48bc-bf47-2dea4dd389b8",
+      "name": "Send a message1",
+      "webhookId": "3a0cf01b-ae56-40f4-aca4-55f8015e9b20",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Wg7pB2CYpLRCsDq2",
+          "name": "UL Schedule"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Populate Temple with App Script": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Populate Temple with App Script1": {
+      "main": [
+        [
+          {
+            "node": "Update a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Validate Inputs1": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Calculate Available Minutes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Calculate Available Minutes1": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Filter Modules by Selection1": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Apply Certification Requirements1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Calculate Lessons Needed1": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Distribute Days Across Weeks1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Distribute Days Across Weeks1": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Build Weekly Schedule1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Build Weekly Schedule1": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Format Output1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Format Output1": {
+      "main": [
+        [
+          {
+            "node": "Format Data for template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Collect data from DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Data": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Set Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Data": {
+      "main": [
+        [
+          {
+            "node": "Check if EntreINC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data for template": {
+      "main": [
+        [
+          {
+            "node": "Populate Temple with App Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if EntreINC": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Validate Inputs1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Check if Incubator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Incubator": {
+      "main": [
+        [
+          {
+            "node": "Set Data for Incubator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Incubator rows": {
+      "main": [
+        [
+          {
+            "node": "Fetch INCubatoredu Lessons from Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch INCubatoredu Lessons from Database": {
+      "main": [
+        [
+          {
+            "node": "Parse Teacher Input Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Teacher Input Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate MVP Pitch Week Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate MVP Pitch Week Logic": {
+      "main": [
+        [
+          {
+            "node": "Calculate Available Teaching Weeks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Available Teaching Weeks": {
+      "main": [
+        [
+          {
+            "node": "Filter Lessons Based on Current Position",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Lessons Based on Current Position": {
+      "main": [
+        [
+          {
+            "node": "Apply Three-Tier Priority System & Distribute Lessons",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Data for Google Doc": {
+      "main": [
+        [
+          {
+            "node": "Populate Temple with App Script1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Data for Incubator": {
+      "main": [
+        [
+          {
+            "node": "Get Incubator rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apply Three-Tier Priority System & Distribute Lessons": {
+      "main": [
+        [
+          {
+            "node": "Handle empty weeks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INCubatoredu - Format Output": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data for Google Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Teacher Database": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect data from DB": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Filter Modules by Selection1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row1": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row1": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Handle empty weeks": {
+      "main": [
+        [
+          {
+            "node": "INCubatoredu - Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Collect Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EntreINC - Apply Certification Requirements1": {
+      "main": [
+        [
+          {
+            "node": "EntreINC - Calculate Lessons Needed1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "End Msg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "End Msg1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "779a6833-ce8d-4f5c-b758-b576a94e6ac9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1ef9b2594f67842fffe8bbf84654dc0feecd146bbbe0e50c103fa254fcb5f0b1"
+  },
+  "id": "vloY8cN3iUwliHEEHtiL9",
+  "tags": []
+}
